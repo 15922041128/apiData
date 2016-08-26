@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="dao.pReditDao">
+	
+	<insert id="addPRedit" parameterType="java.util.HashMap">
+		insert into p_redit(
+			personID, contactDate, loanDate, hireDate, expireDate, loanUsed, 
+			totalAmount, balance, status, bizOccurOrg, createUser, createTime) 
+		values(
+			#{personID}, #{contactDate}, #{loanDate}, #{hireDate}, #{expireDate},#{loanUsed}, 
+			#{totalAmount}, #{balance}, #{status}, #{bizOccurOrg}, #{createUser}, #{createTime})
+	</insert>
+	
+	<select id="queryAll" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		select 
+			pp.ID as pp_ID,
+			pp.idCardNo as pp_idCardNo,
+			pp.name as pp_name,
+			pbi.ID as pbi_ID,
+			pbi.personID as pbi_personID,
+			pbi.photo as pbi_photo,
+			pbi.tel as pbi_tel,
+			pbi.address as pbi_address,
+			pbi.createUser as pbi_createUser,
+			pbi.createTime as pbi_createTime,
+			pbi.updateUser as pbi_updateUser,
+			pbi.updateTime as pbi_updateTime,
+			pr.ID as pr_ID,
+			pr.personID as pr_personID,
+			pr.contactDate as pr_contactDate,
+			pr.loanDate as pr_loanDate,
+			pr.hireDate as pr_hireDate,
+			pr.expireDate as pr_expireDate,
+			pr.loanUsed as pr_loanUsed,
+			pr.totalAmount as pr_totalAmount,
+			pr.balance as pr_balance,
+			pr.status as pr_status,
+			pr.bizOccurOrg as pr_bizOccurOrg,
+			pr.createUser as pr_createUser,
+			pr.createTime as pr_createTime,
+			pr.updateUser as pr_updateUser,
+			pr.updateTime as pr_updateTime
+		from p_person pp
+		left join p_baseInfo pbi on pp.ID = pbi.personID
+		left join p_redit pr on pp.ID = pr.personID 
+		where pp.name = #{name} and pp.idCardNo = #{idCardNo} 
+	</select>
+	
+</mapper>

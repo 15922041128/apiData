@@ -1,0 +1,156 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!-- saved from url=(0069)https://ipcrs.pbccrc.org.cn/setSafetyLevel.do?method=index&isnew=true -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>信贷信息服务平台</title>
+
+<link type="text/css" href="/ApiData/css/public.css" rel="stylesheet">
+<link type="text/css" href="/ApiData/css/page.css" rel="stylesheet">
+<link type="text/css" href="/ApiData/css/new.css" rel="stylesheet">
+<link type="text/css" href="/ApiData/css/table.css" rel="stylesheet">
+<script type="text/javascript" src="/ApiData/js/libs/jquery/jquery-2.1.1.min.js"></script>
+<script type="text/javascript" src="/ApiData/js/util.js"></script>
+<script type="text/javascript">
+$(function() {
+    $("table tr:nth-child(odd)").addClass("odd-row");
+	$("table td:first-child, table th:first-child").addClass("first");
+	$("table td:last-child, table th:last-child").addClass("last");
+});
+</script>
+<script type="text/javascript">
+$(document).ready(function() {
+	
+	var name = getUrlValue('name');
+	var idCardNo = getUrlValue('idCardNo');
+    
+	var params = {"name" : name, "idCardNo" : idCardNo};
+	 
+	 $.ajax({
+	        async:false,
+	        type: "GET",  
+	        url: getLocation() + "/r/person/query", 
+	        data: params,
+	        success: function(datas){
+	        	
+	        	// 基本信息
+	        	var pp_name = datas[0].pp_name;
+	        	var pp_idCardNo = datas[0].pp_idCardNo;
+	        	var pbi_tel = datas[0].pbi_tel;
+	        	var pbi_address = datas[0].pbi_address;
+	        	var pbi_photo = datas[0].pbi_photo;
+	        	var pbi_ID = datas[0].pbi_ID;
+	        	$("#pp_idCardNo").html(pp_idCardNo);
+	        	$("#pp_name").html(pp_name);
+	        	$("#pbi_tel").html(pbi_tel);
+	        	$("#pbi_address").html(pbi_address);
+	        	
+	        	//var image = document.getElementById('pbi_photo');
+	        	//image.src = pbi_photo;
+	        	
+	        	
+	        	// 信用信息
+	        }  
+	    });
+});
+
+</script>
+</head>
+<body>
+<div style="margin-top: 30px;"><h1 style ="font-size:30px">信贷信息查询结果</h1></div>
+<div style="margin-top: 30px;">
+	<div align="center" style="margin-top: 10px;"><font><b>基本信息</b></font></div>
+	<table cellspacing="0">
+		<tr>
+			<td>
+				姓名：<label id="pp_name"></label>
+			</td>
+			<td>
+				身份证号：<label id="pp_idCardNo"></label>
+			</td>
+			<td rowspan="2" style="width:100px">
+				<!--  
+				<img src="/ApiData/images/photo.png" height="100" width="80" />
+				-->
+				<img src="/ApiData/files/photos/1471577580110.jpg" id="pbi_photo"  height="100" width="80"/>
+
+			</td>
+		</tr>
+		<tr>
+			<td>
+				手机号：<label id="pbi_tel"></label>
+			</td>
+			<td>
+				地址：<label id="pbi_address"></label>
+			</td>
+		</tr>
+	</table>
+	
+	<div align="center" style="margin-top: 10px;"><font><b>信用信息</b></font></div>
+	<table cellspacing="0">
+		<tr nowrap>
+			<th>
+				合同日期
+			</th>
+			<th>
+				放款日期
+			</th>
+			<th>
+				起租日
+			</th>
+			<th>
+				到期日
+			</th>
+			<th>
+				贷款用途
+			</th>
+			<th>
+				总金额
+			</th>
+			<th>
+				余额
+			</th>
+			<th>
+				状态
+			</th>
+			<th>
+				业务发生机构
+			</th>
+			<th>
+				日期时间
+			</th>
+		</tr>
+		<tr>
+			<td>
+				2015-10-10
+			</td>
+			<td>
+				2015-10-20
+			</td>
+			<td>
+				2015-11-01
+			</td>
+			<td>
+				2019-11-01
+			</td>
+			<td>
+				购买设备
+			</td>
+			<td>
+				100,000,000
+			</td>
+			<td>
+				50,000,000
+			</td>
+			<td>
+				未还清
+			</td>
+			<td>
+				中国人民银行
+			</td>
+			<td>
+				2016-01-01
+			</td>
+		</tr>
+	</table>
+</div> 
+</body>
+</html>
