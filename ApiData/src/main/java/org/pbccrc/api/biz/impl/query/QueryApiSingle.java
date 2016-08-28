@@ -49,6 +49,10 @@ public class QueryApiSingle implements QueryApi {
 		// 返回信息对象
 		ResultContent resultContent = new ResultContent();
 		
+		// 本地api参数
+		String localParams = String.valueOf(localApi.get("params"));
+		JSONArray localParamArray = JSONArray.parseArray(localParams);
+		
 		// 获得远程api
 		List<Map<String, Object>> remoteApiList = remoteApiDao.getRemoteApiByLocal(Integer.parseInt(String.valueOf(localApi.get("ID"))));
 		Map<String, Object> remoteApi = remoteApiList.get(0);
@@ -94,14 +98,56 @@ public class QueryApiSingle implements QueryApi {
 		
 		// 将本地api参数转换成远程api参数
 		JSONArray localParamRelArray = JSONArray.parseArray(localParamRel);
+//		for (Object o : localParamRelArray) {
+//			JSONObject localParam = (JSONObject)o;
+//			for (Object object : remoteParamArray) {
+//				JSONObject remoteParam = (JSONObject)object;
+//				String paramName = String.valueOf(remoteParam.get("paramName"));
+//				String lParam = String.valueOf(localParam.get(paramName));
+//				if (!StringUtil.isNull(lParam)) {
+//					remoteParam.put("paramName", lParam);
+//					break;
+//				}
+//			}
+//		}
 		for (Object o : localParamRelArray) {
+			
 			JSONObject localParam = (JSONObject)o;
+			
+			// 获得本地api参数名称
+			String localParamName = localParam.getString(localParam.keySet().iterator().next());
+			
+			// 遍历远程参数集合
 			for (Object object : remoteParamArray) {
+				
 				JSONObject remoteParam = (JSONObject)object;
 				String paramName = String.valueOf(remoteParam.get("paramName"));
 				String lParam = String.valueOf(localParam.get(paramName));
+				
+				// 遍历本地参数集合,在本地参数集合中找到该参数,并判断参数类型
+				// 如果参数类型为常量 ,直接添加,并跳转到下一条记录
+				boolean isBreak = false;
+				for (Object o1 : localParamArray) {
+					JSONObject localObject = (JSONObject)o1;
+					String localObjectParanName = localObject.getString("paramName");
+					if (localParamName.equals(localObjectParanName)) {
+						String paramType = localObject.getString("paramType");
+						if (Constants.PARAM_TYPE_CONSTANT.equals(paramType)) {
+							if (!StringUtil.isNull(lParam)) {
+								remoteParam.put("paramName", lParam);
+								isBreak = true;
+							}
+						}
+						break;
+					}
+				}
+				if (isBreak) {
+					break;
+				}
+				
 				if (!StringUtil.isNull(lParam)) {
 					remoteParam.put("paramName", lParam);
+					break;
 				}
 			}
 		}
@@ -114,7 +160,7 @@ public class QueryApiSingle implements QueryApi {
 			String paramName = String.valueOf(remoteParam.get("paramName"));
 			String notNull = String.valueOf(remoteParam.get("notNull"));
 			String paramType = String.valueOf(remoteParam.get("paramType"));
-		
+			
 			// 获取service参数名称
 			if (Constants.PARAM_TYPE_SERVICE.equals(paramType)) {
 				serviceName = paramName;
@@ -123,6 +169,26 @@ public class QueryApiSingle implements QueryApi {
 			// 获取apiKey参数名称
 			if (Constants.PARAM_TYPE_APIKEY.equals(paramType)) {
 				apiKeyName = paramName;
+			}
+			
+			// 遍历本地参数集合,在本地参数集合中找到该参数,并判断参数类型
+			// 如果参数类型为常量 ,直接添加,并跳转到下一条记录
+			boolean isContinue = false;
+			for (Object o1 : localParamArray) {
+				JSONObject localObject = (JSONObject)o1;
+				String localObjectParanName = localObject.getString("paramName");
+				if (paramName.equals(localObjectParanName)) {
+					String localParamType = localObject.getString("paramType");
+					if (Constants.PARAM_TYPE_CONSTANT.equals(localParamType)) {
+						String constantValue = localObject.getString("constantValue");
+						isContinue = true;
+						paramMap.put(paramName, constantValue);
+					}
+					break;
+				}
+			}
+			if (isContinue) {
+				continue;
 			}
 			
 			// 判断参数是否为必填
@@ -158,6 +224,7 @@ public class QueryApiSingle implements QueryApi {
 				if (key.equals(String.valueOf(localParam.get(relKey)))) {
 					paramMap.put(relKey, value);
 					paramMap.remove(key);
+					break;
 				}
 			}
 		}
@@ -199,16 +266,18 @@ public class QueryApiSingle implements QueryApi {
 			values.add(String.valueOf(localApi.get("returnType")));
 			values.add(resultStr);
 			
-			// 本地api参数
-			String localParams = String.valueOf(localApi.get("params"));
-			JSONArray localParamArray = JSONArray.parseArray(localParams);
 			// insert项
 			for (Object o : localParamArray) {
 				JSONObject object = (JSONObject)o;
 				String paramName = String.valueOf(object.get("paramName"));
 				String paramType = String.valueOf(object.get("paramType"));
+				// url类型
 				if (Constants.PARAM_TYPE_URL.equals(paramType) 
 						&& null != urlParams.get(paramName) && !StringUtil.isNull(((String[])urlParams.get(paramName))[0])) {
+					fields.add(paramName);
+				}
+				// 常量
+				if (Constants.PARAM_TYPE_CONSTANT.equals(paramType)) {
 					fields.add(paramName);
 				}
 			}
@@ -218,9 +287,15 @@ public class QueryApiSingle implements QueryApi {
 				JSONObject object = (JSONObject)o;
 				String paramName = String.valueOf(object.get("paramName"));
 				String paramType = String.valueOf(object.get("paramType"));
+				// url类型
 				if (Constants.PARAM_TYPE_URL.equals(paramType) 
 						&& null != urlParams.get(paramName) && !StringUtil.isNull(((String[])urlParams.get(paramName))[0])) {
 					values.add(((String[])urlParams.get(paramName))[0]);
+				}
+				// 常量
+				if (Constants.PARAM_TYPE_CONSTANT.equals(paramType)) {
+					String constantValue = String.valueOf(object.get("constantValue"));
+					values.add(constantValue);
 				}
 			}
 			entity.setValues(values);

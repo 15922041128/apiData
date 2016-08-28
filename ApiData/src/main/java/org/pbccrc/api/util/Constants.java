@@ -53,6 +53,7 @@ public class Constants {
 	// 参数类型
 	public static final String PARAM_TYPE_HEAD = "head";
 	public static final String PARAM_TYPE_URL = "url";
+	public static final String PARAM_TYPE_CONSTANT = "constant";
 	public static final String PARAM_TYPE_SERVICE = "service";
 	public static final String PARAM_TYPE_APIKEY = "apiKey";
 	
