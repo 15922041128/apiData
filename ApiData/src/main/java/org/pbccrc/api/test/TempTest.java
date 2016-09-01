@@ -9,14 +9,21 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.ws.rs.core.MediaType;
+
 import org.pbccrc.api.util.DesUtils;
+import org.pbccrc.api.util.StringUtil;
 
 import com.alibaba.fastjson.JSON;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.config.ClientConfig;
+import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.core.util.Base64;
 
 public class TempTest {
-
-	public static void main(String[] args) throws IOException {
+	
+	public static void test1() throws Exception{
 		HttpURLConnection httpConnection = null;
 		OutputStream outputStream = null;
 		InputStreamReader inputStreamReader = null;
@@ -24,10 +31,14 @@ public class TempTest {
 		String lineString = "";
 		try {
 			
-			String url = "http://www.uniocredit.com/nuapi/UService.do?service=ucqiis&appid=D37EF162524F265";
+			String url = "http://www.uniocredit.com/nuapi/UService.do?service=ucquanlian&appid=D37EF162524F265";
 			Map map=new HashMap();
-			map.put("NAME", "王梓");
-			map.put("IDENTITYCARD", "120103198603292638");
+			map.put("identityCard", "120103198603292638");
+//			map.put("personName", "王梓");
+//			map.put("personIDNum", "120103198603292638");
+//			map.put("sortName", "总监理工程师");
+//			map.put("BANKPREMOBILE", "15922041128");
+			
 			
 			String readLine = JSON.toJSONString(map);
 			httpConnection = (HttpURLConnection) new URL(url).openConnection();
@@ -62,5 +73,35 @@ public class TempTest {
 			inputStreamReader.close();
 			httpConnection.disconnect();
 		}
+	}
+	
+	public static void test2() {
+		ClientConfig config = new DefaultClientConfig();
+		config.getProperties().put(ClientConfig.PROPERTY_CONNECT_TIMEOUT, 10 * 1000);
+		Client client = Client.create(config);
+
+		StringBuffer url = new StringBuffer();
+//		url.append("http://127.0.0.1:8080/ApiData/r/ldb/get");
+		url.append("http://www.qilingyz.com/api.php");
+//		url.append("?m=open.queryStar");
+//		url.append("&appkey=jdwx991230");
+//		url.append("&fullName=王梓");
+//		url.append("&identityCard=1120103198603292638");
+		url.append("?m=open.queryScore");
+		url.append("&identityCard=1120103198603292638");
+		url.append("&appkey=NyiKvzaqtz");
+		
+		WebResource resource = client.resource(url.toString());
+		
+		String result = resource.accept(MediaType.APPLICATION_JSON_TYPE, MediaType.APPLICATION_XML_TYPE).header("apiKey", "X37EF162524F265").header("userID", "1").get(String.class);
+		
+		result = StringUtil.decodeUnicode(result);
+		
+		System.out.println(result);
+	}
+
+	public static void main(String[] args) throws Exception {
+//		test1();
+		test2();
 	}
 }

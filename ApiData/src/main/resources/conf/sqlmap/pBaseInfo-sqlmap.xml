@@ -17,4 +17,8 @@
 			updateUser = #{updateUser}, updateTime = #{updateTime} where personID = ${personID}
 	</update>
 	
+	<select id="queryByPersonID" parameterType="java.lang.String" resultType="java.util.HashMap">
+		select * from p_baseInfo where personID = #{personID} order by updateTime desc
+	</select>
+	
 </mapper>

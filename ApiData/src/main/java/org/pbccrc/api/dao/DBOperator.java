@@ -33,5 +33,25 @@ public class DBOperator extends AbstractMyBatisDao{
 		
 		return getSqlSession().selectOne("dao.dbOperator.queryData", entity);
 	}
+	
+	public List<Map<String, Object>> queryDatas(DBEntity entity) {
+		
+		StringBuffer sql = new StringBuffer();
+		
+		List<String> fields = entity.getFields();
+		List<String> values = entity.getValues();
+		
+		for (int i = 0; i < fields.size(); i++) {
+			sql.append(Constants.AND);
+			sql.append(fields.get(i));
+			sql.append(Constants.EQUAL);
+			sql.append(Constants.SINGLE_QUOTES + values.get(i) + Constants.SINGLE_QUOTES);
+			sql.append(Constants.SPACE);
+		}
+		
+		entity.setSql(sql.toString());
+		
+		return getSqlSession().selectList("dao.dbOperator.queryData", entity);
+	}
 
 }

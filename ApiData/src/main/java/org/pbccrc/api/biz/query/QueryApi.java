@@ -12,5 +12,5 @@ public interface QueryApi {
 	 * @return
 	 * @throws Exception
 	 */
-	public String query(Map<String, Object> localApi, HttpServletRequest request) throws Exception;
+	public Map<String, Object> query(Map<String, Object> localApi, HttpServletRequest request) throws Exception;
 }

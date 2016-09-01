@@ -7,4 +7,8 @@
 		select * from relation where apiKey = #{apiKey} and userID = #{userID} and localApiID = #{localApiID}
 	</select>
 	
+	<update id="updateCount" parameterType="java.lang.String">
+		update relation set count = count - 1 where ID = #{ID} 
+	</update>
+	
 </mapper>

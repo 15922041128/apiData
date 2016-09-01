@@ -12,7 +12,8 @@
 			#{totalAmount}, #{balance}, #{status}, #{bizOccurOrg}, #{createUser}, #{createTime})
 	</insert>
 	
-	<select id="queryAll" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+	<select id="queryAll" parameterType="java.lang.String" resultType="java.util.HashMap">
+		<!--  
 		select 
 			pp.ID as pp_ID,
 			pp.idCardNo as pp_idCardNo,
@@ -45,6 +46,8 @@
 		left join p_baseInfo pbi on pp.ID = pbi.personID
 		left join p_redit pr on pp.ID = pr.personID 
 		where pp.name = #{name} and pp.idCardNo = #{idCardNo} 
+		-->
+		select * from p_redit where personID = #{personID} 
 	</select>
 	
 </mapper>

@@ -17,5 +17,9 @@ public class RelationDao extends AbstractMyBatisDao {
 
 		return getSqlSession().selectOne("dao.relationDao.queryRelation", param);
 	}
+	
+	public void updateCount(String ID) {
+		getSqlSession().update("dao.relationDao.updateCount", ID);
+	}
 
 }

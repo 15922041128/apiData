@@ -1,18 +1,17 @@
 package org.pbccrc.api.biz.impl;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.sql.Blob;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.pbccrc.api.bean.DBEntity;
 import org.pbccrc.api.bean.User;
 import org.pbccrc.api.biz.PersonBiz;
+import org.pbccrc.api.dao.DBOperator;
 import org.pbccrc.api.dao.PBaseInfoDao;
 import org.pbccrc.api.dao.PPersonDao;
 import org.pbccrc.api.dao.PReditDao;
@@ -21,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 
 @Service
 public class PersonBizImpl implements PersonBiz {
@@ -33,6 +33,9 @@ public class PersonBizImpl implements PersonBiz {
 	
 	@Autowired
 	private PReditDao pReditDao;
+	
+	@Autowired
+	private DBOperator dbOperator;
 
 	/**
 	 * @param name          姓名
@@ -71,17 +74,23 @@ public class PersonBizImpl implements PersonBiz {
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		
 		/** p_baseInfo表操作 */
-		if(pBaseInfoDao.isExist(personID) > 0) {
-			// 当前数据在pBaseInfo中已存在,update
-			pBaseInfo.put("updateUser", currentUser);
-			pBaseInfo.put("updateTime", format.format(new Date()));
-			pBaseInfoDao.updatePerson(pBaseInfo);
-		} else {
-			// 当前数据在pBaseInfo中不存在,insert
-			pBaseInfo.put("createUser", currentUser);
-			pBaseInfo.put("createTime", format.format(new Date()));
-			pBaseInfoDao.addPerson(pBaseInfo);
-		}
+//		if(pBaseInfoDao.isExist(personID) > 0) {
+//			// 当前数据在pBaseInfo中已存在,update
+//			pBaseInfo.put("updateUser", currentUser);
+//			pBaseInfo.put("updateTime", format.format(new Date()));
+//			pBaseInfoDao.updatePerson(pBaseInfo);
+//		} else {
+//			// 当前数据在pBaseInfo中不存在,insert
+//			pBaseInfo.put("createUser", currentUser);
+//			pBaseInfo.put("createTime", format.format(new Date()));
+//			pBaseInfoDao.addPerson(pBaseInfo);
+//		}
+		// 即使存在相同数据,依然保留
+		pBaseInfo.put("createUser", currentUser);
+		pBaseInfo.put("createTime", format.format(new Date()));
+		pBaseInfo.put("updateUser", currentUser);
+		pBaseInfo.put("updateTime", format.format(new Date()));
+		pBaseInfoDao.addPerson(pBaseInfo);
 		
 		return personID;
 		
@@ -127,71 +136,59 @@ public class PersonBizImpl implements PersonBiz {
 	 * @param idCardNo			身份证号
 	 * @return
 	 */
-	public JSONArray getReditList(String name, String idCardNo) throws Exception{
+	public JSONObject getReditList(String name, String idCardNo) throws Exception{
 		
-		JSONArray array = new JSONArray();
+		JSONObject returnObj = new JSONObject();
 		
-		Map<String, Object> pRedit = new HashMap<String, Object>();
-		pRedit.put("name", name);
-		pRedit.put("idCardNo",idCardNo);
+		// 获取用户ID
+		Map<String, String> person = new HashMap<String, String>();
+		person.put("name", name);
+		person.put("idCardNo", idCardNo);
+		Map<String, Object> resPerson = pPersonDao.selectOne(person);
+		if (null == resPerson) {
+			returnObj.put("status", "error");
+			return returnObj;
+		}
+		String personID = String.valueOf(resPerson.get(Constants.PERSON_ID));
+		returnObj.put("person", person);
 		
-		List<Map<String, Object>> reditList = pReditDao.queryAll(pRedit);
-		
-		for (int i = 0 ; i < reditList.size(); i++) {
-			
-			Map<String, Object> map = reditList.get(i);
-			
-			array.add(map);
-			
-//			Blob blob = (Blob) map.get("pbi_photo");
-//			InputStream inputStream = blob.getBinaryStream();
-//			int length = (int) blob.length();
-//			byte[] b = new byte[length];
-//			inputStream.read(b, 0, length);
-//			PrintWriter out = response.getWriter();
-//			InputStream is = new ByteArrayInputStream(b);
-//			int a = is.read();
-//			while (a != -1) {
-//				out.print((char) a);
-//				a = is.read();
-//			}
-//			out.flush();
-//			out.close();
-
-			
-			
-//			System.out.println(map.get("pp_ID"));
-//			System.out.println(map.get("pp_idCardNo"));
-//			System.out.println(map.get("pp_name"));
-//			
-//			System.out.println(map.get("pbi_ID"));
-//			System.out.println(map.get("pbi_personID"));
-//			System.out.println(map.get("pbi_photo"));
-//			System.out.println(map.get("pbi_tel"));
-//			System.out.println(map.get("pbi_address"));
-//			System.out.println(map.get("pbi_createUser"));
-//			System.out.println(map.get("pbi_createTime"));
-//			System.out.println(map.get("pbi_updateUser"));
-//			System.out.println(map.get("pbi_updateTime"));
-//			
-//			System.out.println(map.get("pr_ID"));
-//			System.out.println(map.get("pr_personID"));
-//			System.out.println(map.get("pr_contactDate"));
-//			System.out.println(map.get("pr_loanDate"));
-//			System.out.println(map.get("pr_hireDate"));
-//			System.out.println(map.get("pr_expireDate"));
-//			System.out.println(map.get("pr_loanUsed"));
-//			System.out.println(map.get("pr_totalAmount"));
-//			System.out.println(map.get("pr_balance"));
-//			System.out.println(map.get("pr_status"));
-//			System.out.println(map.get("pr_bizOccurOrg"));
-//			System.out.println(map.get("pr_createUser"));
-//			System.out.println(map.get("pr_createTime"));
-//			System.out.println(map.get("pr_updateUser"));
-//			System.out.println(map.get("pr_updateTime"));
+		// 获取用户基本信息
+		List<Map<String, Object>> pBaseInfoList = pBaseInfoDao.queryByPersonID(personID);
+		if (null == pBaseInfoList) {
+			returnObj.put("pBaseInfo", null);
+		} else {
+			returnObj.put("pBaseInfo", pBaseInfoList.get(0));
 		}
 		
-		return array;
+		// 获取用户信贷信息
+		List<Map<String, Object>> reditList = pReditDao.queryAll(personID);
+		JSONArray array = new JSONArray();
+		for (int i = 0 ; i < reditList.size(); i++) {
+			Map<String, Object> map = reditList.get(i);
+			array.add(map);
+		}
+		returnObj.put("reditList", array);
+		
+		// 被失信人被执行信息
+		DBEntity entity = new DBEntity();
+		entity.setTableName("ldb_dishonest_info");
+		List<String> fields = new ArrayList<String>();
+		fields.add("INAME");
+		fields.add("CARDNUM");
+		List<String> values = new ArrayList<String>();
+		values.add(name);
+		values.add(idCardNo);
+		entity.setFields(fields);
+		entity.setValues(values);
+		List<Map<String, Object>> dishonestList = dbOperator.queryDatas(entity);
+		array = new JSONArray();
+		for (Map<String, Object> map : dishonestList) {
+			array.add(map);
+		}
+		
+		returnObj.put("dishonestList", array);
+		
+		return returnObj;
 	}
-
+	
 }

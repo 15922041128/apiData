@@ -12,8 +12,8 @@ public class PReditDao extends AbstractMyBatisDao{
 		return getSqlSession().update("dao.pReditDao.addPRedit", pRedit);
 	}
 	
-	public List<Map<String, Object>> queryAll(Map<String, Object> pRedit) {
-		return getSqlSession().selectList("dao.pReditDao.queryAll", pRedit);
+	public List<Map<String, Object>> queryAll(String personID) {
+		return getSqlSession().selectList("dao.pReditDao.queryAll", personID);
 	}
 	
 	

@@ -12,6 +12,7 @@ import org.pbccrc.api.biz.QueryApiBiz;
 import org.pbccrc.api.biz.query.QueryApi;
 import org.pbccrc.api.dao.DBOperator;
 import org.pbccrc.api.dao.LocalApiDao;
+import org.pbccrc.api.dao.RelationDao;
 import org.pbccrc.api.util.Constants;
 import org.pbccrc.api.util.StringUtil;
 import org.pbccrc.api.util.Validator;
@@ -34,6 +35,9 @@ public class QueryApiBizImpl implements QueryApiBiz{
 	
 	@Autowired
 	private Validator validator;
+	
+	@Autowired
+	private RelationDao relationDao;
 	
 	@Override
 	@SuppressWarnings("rawtypes")
@@ -110,15 +114,24 @@ public class QueryApiBizImpl implements QueryApiBiz{
 			if (Constants.PREFIX_SINGLE.equals(isSingle)) {
 				// 唯一外部api
 				String returnVal = String.valueOf(queryData.get("returnVal"));
-				return returnVal;
+				result = returnVal;
 			} else {
 				// 多个外部api
 				JSONObject retJson = new JSONObject();
 				for (String param : returnParam) {
 					retJson.put(param, queryData.get(param));
 				}
-				return retJson.toJSONString();
+				result = retJson.toJSONString();
 			}
+			
+			// 更新localApi访问次数
+			Map<String, Object> relation = relationDao.query(userID, apiKey, Integer.parseInt(String.valueOf(localApi.get("ID"))));
+			int count = Integer.parseInt(String.valueOf(relation.get("count")));
+			if (-1 != count) {
+				String relationID = String.valueOf(relation.get("ID"));
+				relationDao.updateCount(relationID);
+			}
+			
 		} else {
 			// 本地api无数据 查询外部api
 			
@@ -138,7 +151,18 @@ public class QueryApiBizImpl implements QueryApiBiz{
 			
 			queryApi = (QueryApi)clazz.newInstance();
 			
-			result = queryApi.query(localApi, request);
+			Map<String, Object> returnMap = queryApi.query(localApi, request);
+			result = String.valueOf(returnMap.get("resultStr"));
+			boolean updateCount = Boolean.parseBoolean(String.valueOf(returnMap.get("updateCount")));
+			if (updateCount) {
+				// 更新访问localApi次数
+				Map<String, Object> relation = relationDao.query(userID, apiKey, Integer.parseInt(String.valueOf(localApi.get("ID"))));
+				int count = Integer.parseInt(String.valueOf(relation.get("count")));
+				if (-1 != count) {
+					String relationID = String.valueOf(relation.get("ID"));
+					relationDao.updateCount(relationID);
+				}
+			}
 		}
 		
 		return result;

@@ -39,7 +39,9 @@ public class QueryApiSingle implements QueryApi {
 
 	@Override
 	@SuppressWarnings("rawtypes")
-	public String query(Map<String, Object> localApi, HttpServletRequest request) throws Exception{
+	public Map<String, Object> query(Map<String, Object> localApi, HttpServletRequest request) throws Exception{
+		
+		Map<String, Object> returnMap = new HashMap<String, Object>();
 
 		String resultStr = Constants.BLANK;
 		
@@ -83,7 +85,9 @@ public class QueryApiSingle implements QueryApi {
 			resultContent.setErrNum(Constants.ERR_CNT);
 			resultContent.setRetMsg(Constants.RET_MSG_CNT);
 			resultStr = JSONObject.toJSONString(resultContent);
-			return resultStr;
+			returnMap.put("resultStr", resultStr);
+			returnMap.put("updateCount", false);
+			return returnMap;
 		}
 		
 		// 远程访问参数列表
@@ -98,18 +102,6 @@ public class QueryApiSingle implements QueryApi {
 		
 		// 将本地api参数转换成远程api参数
 		JSONArray localParamRelArray = JSONArray.parseArray(localParamRel);
-//		for (Object o : localParamRelArray) {
-//			JSONObject localParam = (JSONObject)o;
-//			for (Object object : remoteParamArray) {
-//				JSONObject remoteParam = (JSONObject)object;
-//				String paramName = String.valueOf(remoteParam.get("paramName"));
-//				String lParam = String.valueOf(localParam.get(paramName));
-//				if (!StringUtil.isNull(lParam)) {
-//					remoteParam.put("paramName", lParam);
-//					break;
-//				}
-//			}
-//		}
 		for (Object o : localParamRelArray) {
 			
 			JSONObject localParam = (JSONObject)o;
@@ -164,11 +156,13 @@ public class QueryApiSingle implements QueryApi {
 			// 获取service参数名称
 			if (Constants.PARAM_TYPE_SERVICE.equals(paramType)) {
 				serviceName = paramName;
+				continue;
 			}
 			
 			// 获取apiKey参数名称
 			if (Constants.PARAM_TYPE_APIKEY.equals(paramType)) {
 				apiKeyName = paramName;
+				continue;
 			}
 			
 			// 遍历本地参数集合,在本地参数集合中找到该参数,并判断参数类型
@@ -223,7 +217,9 @@ public class QueryApiSingle implements QueryApi {
 				
 				if (key.equals(String.valueOf(localParam.get(relKey)))) {
 					paramMap.put(relKey, value);
-					paramMap.remove(key);
+					if (!relKey.equals(key)) {
+						paramMap.remove(key);
+					}
 					break;
 				}
 			}
@@ -244,69 +240,112 @@ public class QueryApiSingle implements QueryApi {
 			// 全联加密
 			resultStr = remoteApiOperator.qlRemoteAccept(encryptKey, url, paramMap);
 		}
+		returnMap.put("resultStr", resultStr);
 		
 		// 解析返回结果
 		JSONObject resultJson = JSONObject.parseObject(resultStr);
 		JSONObject retCodeJson = JSONObject.parseObject(retCode);
-		String codeName = retCodeJson.getString("codeName");
-		String codeValue = retCodeJson.getString("codeValue");
-		// 判断返回结果是否与插入数据条件一致
+		JSONObject codeJson = retCodeJson.getJSONObject("code");
+		String codeName = codeJson.getString("codeName");
+		String codeValue = codeJson.getString("codeValue");
+		// 判断返回结果是否与code条件一致
 		if (String.valueOf(resultJson.get(codeName)).equals(codeValue)) {
-			// tableName末段与localApi.service后缀相同
-			String tableName = String.valueOf(localApi.get("service")).split(Constants.CONNECTOR_LINE)[1];
-			// DB操作对象
-			DBEntity entity = new DBEntity();
-			entity.setTableName("d_" + "s_" + tableName);
-			List<String> fields = new ArrayList<String>();
-			fields.add("localApiID");
-			fields.add("returnTyp");
-			fields.add("returnVal");
-			List<String> values = new ArrayList<String>();
-			values.add(String.valueOf(localApi.get("ID")));
-			values.add(String.valueOf(localApi.get("returnType")));
-			values.add(resultStr);
 			
-			// insert项
-			for (Object o : localParamArray) {
-				JSONObject object = (JSONObject)o;
-				String paramName = String.valueOf(object.get("paramName"));
-				String paramType = String.valueOf(object.get("paramType"));
-				// url类型
-				if (Constants.PARAM_TYPE_URL.equals(paramType) 
-						&& null != urlParams.get(paramName) && !StringUtil.isNull(((String[])urlParams.get(paramName))[0])) {
-					fields.add(paramName);
+			returnMap.put("updateCount", true);
+			
+			// 判断是否与插入条件一致
+			JSONObject insertCondition = retCodeJson.getJSONObject("insertCondition");
+			
+			// 如果插入条件为空,则直接插入数据库
+			if (null == insertCondition) {
+				//  插入数据库
+				insertDB(localApi, resultStr, localParamArray, urlParams);
+				// 更新访问次数
+				remoteApiDao.updateCnt(id, --count);
+			} else {
+				String key = insertCondition.keySet().iterator().next();
+				String[] keyArray = key.split(Constants.CONNECTOR_LINE);
+				JSONObject jsonObject = new JSONObject();
+				
+				for (int n = 0; n < keyArray.length - 1; n++) {
+					if (n == 0) {
+						jsonObject = resultJson.getJSONObject(keyArray[0]);
+					} else {
+						jsonObject = jsonObject.getJSONObject(keyArray[n]);
+					}
 				}
-				// 常量
-				if (Constants.PARAM_TYPE_CONSTANT.equals(paramType)) {
-					fields.add(paramName);
+				
+				String value = insertCondition.getString(key);
+				
+				if (keyArray.length != 1) {
+					key = keyArray[keyArray.length - 1];
+				}
+				
+				if (!StringUtil.isNull(jsonObject.getString(key)) && jsonObject.getString(key).equals(value)) {
+					//  插入数据库
+					insertDB(localApi, resultStr, localParamArray, urlParams);
+					// 更新访问次数
+					remoteApiDao.updateCnt(id, --count);
 				}
 			}
-			entity.setFields(fields);
-			// insert值
-			for (Object o : localParamArray) {
-				JSONObject object = (JSONObject)o;
-				String paramName = String.valueOf(object.get("paramName"));
-				String paramType = String.valueOf(object.get("paramType"));
-				// url类型
-				if (Constants.PARAM_TYPE_URL.equals(paramType) 
-						&& null != urlParams.get(paramName) && !StringUtil.isNull(((String[])urlParams.get(paramName))[0])) {
-					values.add(((String[])urlParams.get(paramName))[0]);
-				}
-				// 常量
-				if (Constants.PARAM_TYPE_CONSTANT.equals(paramType)) {
-					String constantValue = String.valueOf(object.get("constantValue"));
-					values.add(constantValue);
-				}
-			}
-			entity.setValues(values);
-			
-			// 本地数据库插入数据
-			dbOperator.insertData(entity);
-			// 更新访问次数
-			remoteApiDao.updateCnt(id, --count);
 		}
 		
-		return resultStr;
+		return returnMap;
 	}
 
+	@SuppressWarnings("rawtypes")
+	private void insertDB(Map<String, Object> localApi, String resultStr, JSONArray localParamArray, Map urlParams) {
+		
+		// tableName末段与localApi.service后缀相同
+		String tableName = String.valueOf(localApi.get("service")).split(Constants.CONNECTOR_LINE)[1];
+		// DB操作对象
+		DBEntity entity = new DBEntity();
+		entity.setTableName("d_" + "s_" + tableName);
+		List<String> fields = new ArrayList<String>();
+		fields.add("localApiID");
+		fields.add("returnTyp");
+		fields.add("returnVal");
+		List<String> values = new ArrayList<String>();
+		values.add(String.valueOf(localApi.get("ID")));
+		values.add(String.valueOf(localApi.get("returnType")));
+		values.add(resultStr);
+		
+		// insert项
+		for (Object o : localParamArray) {
+			JSONObject object = (JSONObject)o;
+			String paramName = String.valueOf(object.get("paramName"));
+			String paramType = String.valueOf(object.get("paramType"));
+			// url类型
+			if (Constants.PARAM_TYPE_URL.equals(paramType) 
+					&& null != urlParams.get(paramName) && !StringUtil.isNull(((String[])urlParams.get(paramName))[0])) {
+				fields.add(paramName);
+			}
+			// 常量
+			if (Constants.PARAM_TYPE_CONSTANT.equals(paramType)) {
+				fields.add(paramName);
+			}
+		}
+		entity.setFields(fields);
+		// insert值
+		for (Object o : localParamArray) {
+			JSONObject object = (JSONObject)o;
+			String paramName = String.valueOf(object.get("paramName"));
+			String paramType = String.valueOf(object.get("paramType"));
+			// url类型
+			if (Constants.PARAM_TYPE_URL.equals(paramType) 
+					&& null != urlParams.get(paramName) && !StringUtil.isNull(((String[])urlParams.get(paramName))[0])) {
+				values.add(((String[])urlParams.get(paramName))[0]);
+			}
+			// 常量
+			if (Constants.PARAM_TYPE_CONSTANT.equals(paramType)) {
+				String constantValue = String.valueOf(object.get("constantValue"));
+				values.add(constantValue);
+			}
+		}
+		entity.setValues(values);
+		
+		// 本地数据库插入数据
+		dbOperator.insertData(entity);
+		
+	}
 }

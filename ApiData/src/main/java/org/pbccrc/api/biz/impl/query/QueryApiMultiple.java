@@ -44,7 +44,9 @@ public class QueryApiMultiple implements QueryApi {
 
 	@Override
 	@SuppressWarnings("rawtypes")
-	public String query(Map<String, Object> localApi, HttpServletRequest request) throws Exception {
+	public Map<String, Object> query(Map<String, Object> localApi, HttpServletRequest request) throws Exception {
+		
+		Map<String, Object> returnMap = new HashMap<String, Object>();
 		
 		// 返回字符串
 		String resultStr = Constants.BLANK;
@@ -95,7 +97,9 @@ public class QueryApiMultiple implements QueryApi {
 				resultContent.setErrNum(Constants.ERR_CNT);
 				resultContent.setRetMsg(Constants.RET_MSG_CNT);
 				resultStr = JSONObject.toJSONString(resultContent);
-				return resultStr;
+				returnMap.put("resultStr", resultStr);
+				returnMap.put("updateCount", false);
+				return returnMap;
 			}
 			
 			// 远程访问参数列表
@@ -176,11 +180,13 @@ public class QueryApiMultiple implements QueryApi {
 				// 获取service参数名称
 				if (Constants.PARAM_TYPE_SERVICE.equals(paramType)) {
 					serviceName = paramName;
+					continue;
 				}
 				
 				// 获取apiKey参数名称
 				if (Constants.PARAM_TYPE_APIKEY.equals(paramType)) {
 					apiKeyName = paramName;
+					continue;
 				}
 				
 				// 遍历本地参数集合,在本地参数集合中找到该参数,并判断参数类型
@@ -212,7 +218,9 @@ public class QueryApiMultiple implements QueryApi {
 						resultContent.setErrNum(Constants.ERR_URL_INVALID);
 						resultContent.setRetMsg(Constants.RET_MSG_URL_INVALID + paramName);
 						resultStr = JSONObject.toJSONString(resultContent);
-						return resultStr;
+						returnMap.put("resultStr", resultStr);
+						returnMap.put("updateCount", false);
+						return returnMap;
 					}
 					// 设置远程访问参数
 					paramMap.put(paramName, ((String[])urlParams.get(paramName))[0]);
@@ -240,7 +248,9 @@ public class QueryApiMultiple implements QueryApi {
 					
 					if (key.equals(String.valueOf(localParam.get(relKey)))) {
 						paramMap.put(relKey, value);
-						paramMap.remove(key);
+						if (!relKey.equals(key)) {
+							paramMap.remove(key);
+						}
 						break;
 					}
 				}
@@ -271,7 +281,9 @@ public class QueryApiMultiple implements QueryApi {
 				Map<String, Object> code = codeDao.queryByCode(Constants.CODE_ERR_FAIL);
 				resultContent.setErrNum(Constants.CODE_ERR_FAIL);
 				resultContent.setRetMsg(String.valueOf(code.get("codeValue")));
-				return resultContent.toString();
+				returnMap.put("resultStr", resultContent);
+				returnMap.put("updateCount", false);
+				return returnMap;
 			}
 			
 			
@@ -282,6 +294,22 @@ public class QueryApiMultiple implements QueryApi {
 
 //			String[] codeNames = retCodeJson.getString("codeName").split(Constants.COMMA);
 			String codeName = retCodeJson.getString("codeName");
+			
+			// 判断codeName是否存在
+			if (StringUtil.isNull(codeName)) {
+				if (i == remoteApiList.size() - 1) {
+					// 返回
+					Map<String, Object> code = codeDao.queryByCode(Constants.CODE_ERR_FAIL);
+					resultContent.setErrNum(Constants.CODE_ERR_FAIL);
+					resultContent.setRetMsg(String.valueOf(code.get("codeValue")));
+					returnMap.put("resultStr", resultContent);
+					returnMap.put("updateCount", false);
+					return returnMap;
+				} else {
+					continue;
+				}
+			}
+			
 			JSONObject codeValue = retCodeJson.getJSONObject("codeValue");
 			JSONObject insertCondition = retCodeJson.getJSONObject("insertCondition");
 			
@@ -290,9 +318,24 @@ public class QueryApiMultiple implements QueryApi {
 //				codeName = codeNames[0];
 //			}
 			
+			// 判断code值是否存在
 			String returnCode = returnJson.getString(codeName);
-			JSONObject returnCodeObj = codeValue.getJSONObject(returnCode);
+			if (StringUtil.isNull(returnCode)) {
+				if (i == remoteApiList.size() - 1) {
+					// 返回
+					Map<String, Object> code = codeDao.queryByCode(Constants.CODE_ERR_FAIL);
+					resultContent.setErrNum(Constants.CODE_ERR_FAIL);
+					resultContent.setRetMsg(String.valueOf(code.get("codeValue")));
+					returnMap.put("resultStr", resultContent);
+					returnMap.put("updateCount", false);
+					return returnMap;
+				} else {
+					continue;
+				}
+			}
 			
+			// 判断是否有匹配的code
+			JSONObject returnCodeObj = codeValue.getJSONObject(returnCode);
 			if (null == returnCodeObj) {
 				// 没有对应的code 判断是否为最后一条数据
 				// 是:解析并返回 
@@ -302,7 +345,9 @@ public class QueryApiMultiple implements QueryApi {
 					Map<String, Object> code = codeDao.queryByCode(Constants.CODE_ERR_FAIL);
 					resultContent.setErrNum(Constants.CODE_ERR_FAIL);
 					resultContent.setRetMsg(String.valueOf(code.get("codeValue")));
-					return resultContent.toString();
+					returnMap.put("resultStr", resultContent);
+					returnMap.put("updateCount", false);
+					return returnMap;
 				} else {
 					continue;
 				}
@@ -317,6 +362,7 @@ public class QueryApiMultiple implements QueryApi {
 				
 				// 判断是否成功
 				if (Constants.RET_CODE_SUCCESS.equals(codeStatus)) {
+					returnMap.put("updateCount", true);
 					// success
 					// 如果插入条件为空,则直接插入数据库
 					if (null == insertCondition) {
@@ -327,25 +373,27 @@ public class QueryApiMultiple implements QueryApi {
 					} else {
 						// 插入条件不为空,则判断是否符合插入条件
 						String key = insertCondition.keySet().iterator().next();
+						String value = insertCondition.getString(key);
 						String[] keyArray = key.split(Constants.CONNECTOR_LINE);
 						
 						JSONObject jsonObject = new JSONObject();
 						
-						for (int n = 0; n < keyArray.length - 1; n++) {
-							if (n == 0) {
-								jsonObject = returnJson.getJSONObject(keyArray[0]);
-							} else {
-								jsonObject = jsonObject.getJSONObject(keyArray[n]);
+						String returnValue = Constants.BLANK;
+						if (keyArray.length == 1) {
+							returnValue = returnJson.getString(keyArray[0]);
+						} else {
+							for (int n = 0; n < keyArray.length - 1; n++) {
+								if (n == 0) {
+									jsonObject = returnJson.getJSONObject(keyArray[0]);
+								} else {
+									jsonObject = jsonObject.getJSONObject(keyArray[n]);
+								}
 							}
-						}
-						
-						String value = insertCondition.getString(key);
-						
-						if (keyArray.length != 1) {
 							key = keyArray[keyArray.length - 1];
+							returnValue = jsonObject.getString(key);
 						}
 						
-						if (!StringUtil.isNull(jsonObject.getString(key)) && jsonObject.getString(key).equals(value)) {
+						if (!StringUtil.isNull(returnValue) && returnValue.equals(value)) {
 							// insertDB
 							resultStr = insertDB(returnJson, localApi, localParamArray, urlParams, retParamRel);
 							// 更新访问次数
@@ -355,10 +403,13 @@ public class QueryApiMultiple implements QueryApi {
 							Map<String, Object> code = codeDao.queryByCode(Constants.CODE_ERR_SUCCESS);
 							resultContent.setErrNum(localCode);
 							resultContent.setRetMsg(String.valueOf(code.get("codeValue")));
-							return resultContent.toString();
+							resultContent.setRetData(returnStr);
+							resultStr = resultContent.toString();
 						}
 					}
+					break;
 				} else {
+					returnMap.put("updateCount", false);
 					// error
 					// 判断返回类型
 					if (Constants.RET_CODE_TYPE_CONTINUE.equals(codeType)) {
@@ -370,7 +421,7 @@ public class QueryApiMultiple implements QueryApi {
 							Map<String, Object> code = codeDao.queryByCode(localCode);
 							resultContent.setErrNum(localCode);
 							resultContent.setRetMsg(String.valueOf(code.get("codeValue")));
-							return resultContent.toString();
+							resultStr = resultContent.toString();
 						} else {
 							continue;
 						}
@@ -379,14 +430,14 @@ public class QueryApiMultiple implements QueryApi {
 						Map<String, Object> code = codeDao.queryByCode(localCode);
 						resultContent.setErrNum(localCode);
 						resultContent.setRetMsg(String.valueOf(code.get("codeValue")));
-						return resultContent.toString();
+						resultStr = resultContent.toString();
 					}
 				}
 			}
 			
 		} // loop remoteApiList end
-		
-		return resultStr;
+		returnMap.put("resultStr", resultStr);
+		return returnMap;
 	}
 	
 	@SuppressWarnings("rawtypes")
@@ -479,7 +530,13 @@ public class QueryApiMultiple implements QueryApi {
 			]
 			*/
 			// 获取对应关系key
-			String[] retKeyArray = retParamRelObj.getString(returnParam).split(Constants.CONNECTOR_LINE);
+			String retParamRelStr = retParamRelObj.getString(returnParam);
+			if (StringUtil.isNull(retParamRelStr)) {
+				values.add(Constants.BLANK);
+				continue;
+			}
+			String[] retKeyArray = retParamRelStr.split(Constants.CONNECTOR_LINE);
+			
 			// 判断key是否为单层
 			if (1 == retKeyArray.length) {
 				// 单层

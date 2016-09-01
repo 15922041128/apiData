@@ -1,11 +1,15 @@
 package org.pbccrc.api.bean;
 
 import java.util.List;
+import java.util.Map;
 
 public class DBEntity {
 	
 	/** 表名 */
 	private String tableName;
+	
+	/** 返回字段 */
+	private Map<String, String> returnFidlds;
 	
 	/** 字段 */
 	private List<String> fields;
@@ -46,6 +50,14 @@ public class DBEntity {
 
 	public void setSql(String sql) {
 		this.sql = sql;
+	}
+	
+	public Map<String, String> getReturnFidlds() {
+		return returnFidlds;
+	}
+
+	public void setReturnFidlds(Map<String, String> returnFidlds) {
+		this.returnFidlds = returnFidlds;
 	}
 	
 }

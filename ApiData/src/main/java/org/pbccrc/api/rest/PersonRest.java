@@ -19,7 +19,7 @@ import org.pbccrc.api.biz.PersonBiz;
 import org.pbccrc.api.util.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 
 @SuppressWarnings("deprecation")
 @Path("/person")
@@ -28,7 +28,6 @@ public class PersonRest {
 	@Autowired
 	private PersonBiz personBiz;
 	
-	@SuppressWarnings("rawtypes")
 	@POST
 	@Path("/add")
 	@Produces(MediaType.MULTIPART_FORM_DATA)
@@ -41,8 +40,8 @@ public class PersonRest {
 		String address = request.getParameter("address");
 		address = java.net.URLDecoder.decode(address, "UTF-8");
 		
-//		String filepath = request.getSession().getServletContext().getRealPath("/") + Constants.FILE_PATH_BASE + File.separator + Constants.FILE_PATH_PHOTO;
-		String filepath = request.getSession().getServletContext().getContextPath() + File.separator + Constants.FILE_PATH_BASE + File.separator + Constants.FILE_PATH_PHOTO;
+		String filepath = request.getSession().getServletContext().getRealPath("/") + Constants.FILE_PATH_BASE + File.separator + Constants.FILE_PATH_PHOTO;
+//		String filepath = request.getSession().getServletContext().getContextPath() + File.separator + Constants.FILE_PATH_BASE + File.separator + Constants.FILE_PATH_PHOTO;
 		File dir = new File(filepath);
 		// 建立目录
 		if (!dir.exists()) {
@@ -116,9 +115,9 @@ public class PersonRest {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response query(@QueryParam("name") String name, @QueryParam("idCardNo") String idCardNo) throws Exception{
 		
-		JSONArray array = personBiz.getReditList(name, idCardNo);
+		JSONObject obj = personBiz.getReditList(name, idCardNo);
 		
-		return Response.ok(array).build();
+		return Response.ok(obj).build();
 	}
 
 }

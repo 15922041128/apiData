@@ -69,11 +69,11 @@ public class Test {
 	
 	public void test2() throws Exception {
 
-		String str = "asdd";
+		String str = "D:/Program/workspace/work/.metadata/.plugins/org.eclipse.wst.server.core/tmp0/wtpwebapps/ApiData/files/photos/1472455211812.jpg";
 		
-		String[] array = str.split("-");
+		String s = str.substring(str.indexOf("/ApiData"));
 		
-		System.out.println(array[0]);
+		System.out.println(s);
 	}
 	
 	public static void main(String[] args) throws Exception {
