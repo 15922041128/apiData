@@ -154,7 +154,7 @@ public class PersonBizImpl implements PersonBiz {
 		
 		// 获取用户基本信息
 		List<Map<String, Object>> pBaseInfoList = pBaseInfoDao.queryByPersonID(personID);
-		if (null == pBaseInfoList) {
+		if (null == pBaseInfoList || pBaseInfoList.size() == 0) {
 			returnObj.put("pBaseInfo", null);
 		} else {
 			returnObj.put("pBaseInfo", pBaseInfoList.get(0));

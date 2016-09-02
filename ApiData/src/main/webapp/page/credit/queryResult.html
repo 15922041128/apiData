@@ -52,18 +52,30 @@ $(document).ready(function() {
 	        	// 基本信息
 	        	var person = datas.person;
 	        	var pBaseInfo = datas.pBaseInfo;
-	        	var pp_name = person.name;
-	        	var pp_idCardNo = person.idCardNo;
-	        	var pbi_tel = pBaseInfo.tel;
-	        	var pbi_address = pBaseInfo.address;
-	        	var pbi_photo = pBaseInfo.photo;
-	        	pbi_photo = pbi_photo.substr(pbi_photo.indexOf('\ApiData'));
-	        	pbi_photo = pbi_photo.replace(/\\/g, "/");
-	        	$("#pp_idCardNo").html(pp_idCardNo);
-	        	$("#pp_name").html(pp_name);
-	        	$("#pbi_tel").html(pbi_tel);
-	        	$("#pbi_address").html(pbi_address);
-	        	$("#pbi_photo").attr('src', '/' + pbi_photo); 
+	        	if (pBaseInfo == null) {
+	        		var pp_name = '';
+		        	var pp_idCardNo = '';
+		        	var pbi_tel = '';
+		        	var pbi_address = '';
+		        	$("#pp_idCardNo").html(pp_idCardNo);
+		        	$("#pp_name").html(pp_name);
+		        	$("#pbi_tel").html(pbi_tel);
+		        	$("#pbi_address").html(pbi_address);
+	        	} else {
+	        		var pp_name = person.name;
+		        	var pp_idCardNo = person.idCardNo;
+		        	var pbi_tel = pBaseInfo.tel;
+		        	var pbi_address = pBaseInfo.address;
+		        	var pbi_photo = pBaseInfo.photo;
+		        	pbi_photo = pbi_photo.substr(pbi_photo.indexOf('\ApiData'));
+		        	pbi_photo = pbi_photo.replace(/\\/g, "/");
+		        	$("#pp_idCardNo").html(pp_idCardNo);
+		        	$("#pp_name").html(pp_name);
+		        	$("#pbi_tel").html(pbi_tel);
+		        	$("#pbi_address").html(pbi_address);
+		        	$("#pbi_photo").attr('src', '/' + pbi_photo); 
+	        	}
+	        	
 	        	
 	        	
 	        	// 信贷信息

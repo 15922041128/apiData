@@ -292,7 +292,6 @@ public class QueryApiMultiple implements QueryApi {
 			// remoteApi.retCode
 			JSONObject retCodeJson = JSONObject.parseObject(retCode);
 
-//			String[] codeNames = retCodeJson.getString("codeName").split(Constants.COMMA);
 			String codeName = retCodeJson.getString("codeName");
 			
 			// 判断codeName是否存在
