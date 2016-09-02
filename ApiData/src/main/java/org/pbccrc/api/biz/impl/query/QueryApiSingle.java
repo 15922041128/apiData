@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -245,28 +247,31 @@ public class QueryApiSingle implements QueryApi {
 		// 解析返回结果
 		JSONObject resultJson = JSONObject.parseObject(resultStr);
 		JSONObject retCodeJson = JSONObject.parseObject(retCode);
-		JSONObject codeJson = retCodeJson.getJSONObject("code");
-		String codeName = codeJson.getString("codeName");
-		String codeValue = codeJson.getString("codeValue");
-		// 判断返回结果是否与code条件一致
-		if (String.valueOf(resultJson.get(codeName)).equals(codeValue)) {
+		
+		// 获取successCondition
+		JSONArray successConditionArray = retCodeJson.getJSONArray("successCondition");
+		// 获取insertCondition
+		JSONObject insertConditionJson = retCodeJson.getJSONObject("insertCondition");
+		
+		// 判断是否成功
+		boolean isSuccess = true;
+		for (Object o : successConditionArray) {
+			JSONObject successCondition = (JSONObject)o;
+			String successConditionName = successCondition.getString("conditionName");
+			String successConditionValue = successCondition.getString("conditionValue");
+			String successConditionType = successCondition.getString("conditionType");
 			
-			returnMap.put("updateCount", true);
-			
-			// 判断是否与插入条件一致
-			JSONObject insertCondition = retCodeJson.getJSONObject("insertCondition");
-			
-			// 如果插入条件为空,则直接插入数据库
-			if (null == insertCondition) {
-				//  插入数据库
-				insertDB(localApi, resultStr, localParamArray, urlParams);
-				// 更新访问次数
-				remoteApiDao.updateCnt(id, --count);
+			// 获取判断用返回value值
+			String successValue = Constants.BLANK;
+			String[] keyArray = successConditionName.split(Constants.CONNECTOR_LINE);
+			// 判断条件是否为多层
+			if (keyArray.length == 1) {
+				// 单层
+				String key = keyArray[0];
+				successValue = resultJson.getString(key);
 			} else {
-				String key = insertCondition.keySet().iterator().next();
-				String[] keyArray = key.split(Constants.CONNECTOR_LINE);
+				// 多层
 				JSONObject jsonObject = new JSONObject();
-				
 				for (int n = 0; n < keyArray.length - 1; n++) {
 					if (n == 0) {
 						jsonObject = resultJson.getJSONObject(keyArray[0]);
@@ -274,20 +279,118 @@ public class QueryApiSingle implements QueryApi {
 						jsonObject = jsonObject.getJSONObject(keyArray[n]);
 					}
 				}
-				
-				String value = insertCondition.getString(key);
-				
-				if (keyArray.length != 1) {
-					key = keyArray[keyArray.length - 1];
+				String key = keyArray[keyArray.length - 1];
+				successValue = jsonObject.getString(key);
+			}
+			
+			// 判断条件类型
+			if (Constants.CONDITION_TYPE_NOTNULL.equals(successConditionType)) {
+				// notNull类型
+				if (StringUtil.isNull(successValue)) {
+					isSuccess = false;
+					break;
 				}
-				
-				if (!StringUtil.isNull(jsonObject.getString(key)) && jsonObject.getString(key).equals(value)) {
-					//  插入数据库
+			} else if (Constants.CONDITION_TYPE_REGEX.equals(successConditionType)) {
+				// 正则类型
+				Pattern pattern = Pattern.compile(successConditionValue);
+				Matcher matcher = pattern.matcher(successValue);
+				if (!matcher.matches()) {
+					isSuccess = false;
+					break;
+				}
+			} else {
+				// 默认为文本类型 (文本类型判断方式为equal)
+				if (!successValue.equals(successConditionValue)) {
+					isSuccess = false;
+					break;
+				}
+			}
+		}
+		
+		if (isSuccess) {
+			// 查询成功
+			// 更新查询次数
+			returnMap.put("updateCount", true);
+			
+			// 判断是否插入数据库
+			boolean isInsert = insertConditionJson.getBoolean("isInsert");
+			if (isInsert) {
+				boolean isertDB = true;
+				JSONArray conditionArray = insertConditionJson.getJSONArray("conditionArray");
+				// 判断insert条件是否为空
+				if (null == conditionArray) {
+					// 如果为空直接插入数据库
+					// 插入数据库
 					insertDB(localApi, resultStr, localParamArray, urlParams);
 					// 更新访问次数
 					remoteApiDao.updateCnt(id, --count);
+				} else {
+					// 不为空则进行条件判断
+					for (Object o : conditionArray) {
+						JSONObject condition = (JSONObject)o;
+						String insertConditionName = condition.getString("conditionName");
+						String insertConditionValue = condition.getString("conditionValue");
+						String insertConditionType = condition.getString("conditionType");
+						
+						// 获取判断用返回value值
+						String insertValue = Constants.BLANK;
+						String[] keyArray = insertConditionName.split(Constants.CONNECTOR_LINE);
+						// 判断条件是否为多层
+						if (keyArray.length == 1) {
+							// 单层
+							String key = keyArray[0];
+							insertValue = resultJson.getString(key);
+						} else {
+							// 多层
+							JSONObject jsonObject = new JSONObject();
+							for (int n = 0; n < keyArray.length - 1; n++) {
+								if (n == 0) {
+									jsonObject = resultJson.getJSONObject(keyArray[0]);
+								} else {
+									jsonObject = jsonObject.getJSONObject(keyArray[n]);
+								}
+							}
+							String key = keyArray[keyArray.length - 1];
+							insertValue = jsonObject.getString(key);
+						}
+						
+						// 判断条件类型
+						if (Constants.CONDITION_TYPE_NOTNULL.equals(insertConditionType)) {
+							// notNull类型
+							if (StringUtil.isNull(insertValue)) {
+								isertDB = false;
+								break;
+							}
+						} else if (Constants.CONDITION_TYPE_REGEX.equals(insertConditionType)) {
+							// 正则类型
+							Pattern pattern = Pattern.compile(insertConditionValue);
+							Matcher matcher = pattern.matcher(insertValue);
+							if (!matcher.matches()) {
+								isertDB = false;
+								break;
+							}
+						} else {
+							// 默认为文本类型 (文本类型判断方式为equal)
+							if (!insertValue.equals(insertConditionValue)) {
+								isertDB = false;
+								break;
+							}
+						}
+					}
+					
+					if (isertDB) {
+						// 插入数据库
+						insertDB(localApi, resultStr, localParamArray, urlParams);
+						// 更新访问次数
+						remoteApiDao.updateCnt(id, --count);
+					}
+					
 				}
 			}
+		} else {
+			// 查询失败
+			// 不更新查询次数
+			returnMap.put("updateCount", false);
 		}
 		
 		return returnMap;

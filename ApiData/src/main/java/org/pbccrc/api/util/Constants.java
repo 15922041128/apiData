@@ -118,4 +118,9 @@ public class Constants {
 	
 	// person
 	public static final String PERSON_ID = "ID";
+	
+	/** conditionType */
+	public static final String CONDITION_TYPE_NOTNULL = "notNull";
+	public static final String CONDITION_TYPE_TEXT = "text";
+	public static final String CONDITION_TYPE_REGEX = "regex";
 }
