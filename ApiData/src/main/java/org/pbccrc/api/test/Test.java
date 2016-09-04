@@ -4,14 +4,9 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.URL;
 import java.security.MessageDigest;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.glassfish.jersey.server.model.Suspendable;
-
-import com.alibaba.fastjson.JSONObject;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Test {
 	
@@ -54,12 +49,19 @@ public class Test {
     
 	public void test(){
 		
-		String s = new String("teststr");  
-        System.out.println("原始：" + s);  
-        System.out.println("MD5后：" + string2MD5(s));  
-        System.out.println("加密的：" + convertMD5(s));  
-        System.out.println("解密的：" + convertMD5(convertMD5(s)));
+//		String s = new String("teststr");  
+//        System.out.println("原始：" + s);  
+//        System.out.println("MD5后：" + string2MD5(s));  
+//        System.out.println("加密的：" + convertMD5(s));  
+//        System.out.println("解密的：" + convertMD5(convertMD5(s)));
 		
+		String regex = "/^(?!abc$)/";
+		
+		Pattern pattern = Pattern.compile(regex);
+		
+		Matcher matcher = pattern.matcher("abc");
+		boolean b= matcher.matches();
+		System.out.println(b);
 	}
 	
 	InputStreamReader inputStreamReader;
@@ -78,7 +80,8 @@ public class Test {
 	
 	public static void main(String[] args) throws Exception {
 		
-		new Test().test2();
+//		new Test().test2();
+		new Test().test();
 		
 	/*	String str = "{\"apikye\": \"appKey\",\"id\": \"idCardNo\"}";
 		

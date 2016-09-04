@@ -13,7 +13,6 @@ public class RemoteApiDao extends AbstractMyBatisDao{
 		return getSqlSession().selectList("dao.remoteApiDao.getRemoteApiByLocal", localApiID);
 	}
 	
-
 	public int updateCnt(int id, int count){
 		
 		Map<String, Object> param = new HashMap<String, Object>();

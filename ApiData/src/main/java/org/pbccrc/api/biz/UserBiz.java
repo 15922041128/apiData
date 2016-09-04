@@ -21,5 +21,17 @@ public interface UserBiz {
 	 * @return			是否成功
 	 */
 	public User login(String userName, String password);
+	
+	/**
+	 * 
+	 * @param userID    用户ID
+	 * @param password  用户新密码
+	 */
+	public void resetPassword(int userID, String password);
+	
+	/**
+	 * @param user 	用户信息
+	 */
+	public void modifyUser(User user);
 
 }

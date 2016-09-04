@@ -69,7 +69,7 @@ public class PersonBizImpl implements PersonBiz {
 		pBaseInfo.put("personID", personID);
 		pBaseInfo.put("tel", tel);
 		pBaseInfo.put("address", address);
-		pBaseInfo.put("photo", photo.getPath());
+		pBaseInfo.put("photo", photo != null ? photo.getPath() : "");
 		
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		

@@ -110,8 +110,10 @@ public class Constants {
 
 	// 查询成功
 	public static final String CODE_ERR_SUCCESS = "102000";
+	public static final String CODE_ERR_SUCCESS_MSG = "查询成功";
 	// 查询失败
 	public static final String CODE_ERR_FAIL = "102001";
+	public static final String CODE_ERR_FAIL_MSG = "查询失败";
 	
 	/**  table filed   */
 	public static final String API_KEY = "apiKey";

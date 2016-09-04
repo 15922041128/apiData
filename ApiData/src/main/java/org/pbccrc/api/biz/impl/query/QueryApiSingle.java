@@ -252,6 +252,8 @@ public class QueryApiSingle implements QueryApi {
 		JSONArray successConditionArray = retCodeJson.getJSONArray("successCondition");
 		// 获取insertCondition
 		JSONObject insertConditionJson = retCodeJson.getJSONObject("insertCondition");
+		// countCondition
+		JSONObject countCondition = retCodeJson.getJSONObject("countCondition");
 		
 		// 判断是否成功
 		boolean isSuccess = true;
@@ -309,9 +311,6 @@ public class QueryApiSingle implements QueryApi {
 		
 		if (isSuccess) {
 			// 查询成功
-			// 更新查询次数
-			returnMap.put("updateCount", true);
-			
 			// 判断是否插入数据库
 			boolean isInsert = insertConditionJson.getBoolean("isInsert");
 			if (isInsert) {
@@ -387,10 +386,77 @@ public class QueryApiSingle implements QueryApi {
 					
 				}
 			}
-		} else {
-			// 查询失败
-			// 不更新查询次数
-			returnMap.put("updateCount", false);
+			
+			// 判断是否更新查询次数
+			boolean isCount = countCondition.getBoolean("isCount");
+			if (isCount) {
+				boolean updateCount = true;
+				JSONArray conditionArray = countCondition.getJSONArray("conditionArray");
+				// 判断更新 次数条件是否为空
+				if (null == conditionArray) {
+					// 如果为空则直接更新查询次数
+					// 更新查询次数
+					returnMap.put("updateCount", updateCount);
+				} else {
+					// 不为空则进行条件判断
+					for (Object o : conditionArray) {
+						JSONObject condition = (JSONObject)o;
+						String countConditionName = condition.getString("conditionName");
+						String countConditionValue = condition.getString("conditionValue");
+						String countConditionType = condition.getString("conditionType");
+						
+						// 获取判断用返回value值
+						String countValue = Constants.BLANK;
+						String[] keyArray = countConditionName.split(Constants.CONNECTOR_LINE);
+						// 判断条件是否为多层
+						if (keyArray.length == 1) {
+							// 单层
+							String key = keyArray[0];
+							countValue = resultJson.getString(key);
+						} else {
+							// 多层
+							JSONObject jsonObject = new JSONObject();
+							for (int n = 0; n < keyArray.length - 1; n++) {
+								if (n == 0) {
+									jsonObject = resultJson.getJSONObject(keyArray[0]);
+								} else {
+									jsonObject = jsonObject.getJSONObject(keyArray[n]);
+								}
+							}
+							String key = keyArray[keyArray.length - 1];
+							countValue = jsonObject.getString(key);
+						}
+						
+						// 判断条件类型
+						if (Constants.CONDITION_TYPE_NOTNULL.equals(countConditionType)) {
+							// notNull类型
+							if (StringUtil.isNull(countValue)) {
+								updateCount = false;
+								break;
+							}
+						} else if (Constants.CONDITION_TYPE_REGEX.equals(countConditionType)) {
+							// 正则类型
+							Pattern pattern = Pattern.compile(countConditionValue);
+							Matcher matcher = pattern.matcher(countValue);
+							if (!matcher.matches()) {
+								updateCount = false;
+								break;
+							}
+						} else {
+							// 默认为文本类型 (文本类型判断方式为equal)
+							if (!countValue.equals(countConditionValue)) {
+								updateCount = false;
+								break;
+							}
+						}
+					}
+					// 更新查询次数
+					returnMap.put("updateCount", updateCount);
+				} 
+			} else {
+				// 不更新查询次数
+				returnMap.put("updateCount", false);
+			}
 		}
 		
 		return returnMap;

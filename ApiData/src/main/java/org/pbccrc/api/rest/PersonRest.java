@@ -17,6 +17,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.pbccrc.api.bean.User;
 import org.pbccrc.api.biz.PersonBiz;
 import org.pbccrc.api.util.Constants;
+import org.pbccrc.api.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.fastjson.JSONObject;
@@ -55,28 +56,13 @@ public class PersonRest {
 		
 		FileItem item = fu.parseRequest(request).get(0);
 		String fileName = item.getName();
-//		fileName = fileName.substring(fileName.lastIndexOf(File.separator) + 1);
-		fileName = fileName.substring(fileName.indexOf(Constants.POINT), fileName.length());
-		fileName = System.currentTimeMillis() + fileName;
-		File photo = new File(filepath + File.separator + fileName);
-		item.write(photo);
-//		List fileItems = fu.parseRequest(request);
-//		Iterator iter = fileItems.iterator();
-//
-//		while (iter.hasNext()) {
-//			FileItem item = (FileItem) iter.next();
-//			String fileName = item.getName();
-//			// 判断是否为文件
-//			if (fileName != null) {
-//				// 取文件名
-//				String fName = fileName.substring(fileName.lastIndexOf(File.separator) + 1);
-//				if (fileName != null && !fileName.equals(Constants.BLANK)) {
-//					File file = new File(filepath + File.separator + fName);
-//					// 上传文件
-//					item.write(file);
-//				}
-//			}
-//		}
+		File photo = null;
+		if (!StringUtil.isNull(fileName)) {
+			fileName = fileName.substring(fileName.indexOf(Constants.POINT), fileName.length());
+			fileName = System.currentTimeMillis() + fileName;
+			photo = new File(filepath + File.separator + fileName);
+			item.write(photo);
+		}
 		
 		User user = (User) request.getSession().getAttribute(Constants.CURRENT_USER);
 		

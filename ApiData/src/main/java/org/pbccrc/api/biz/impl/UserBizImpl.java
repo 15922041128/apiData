@@ -42,5 +42,23 @@ public class UserBizImpl implements UserBiz{
 		
 		return userDao.login(user);
 	}
-
+	
+	/**
+	 * 
+	 * @param userID    用户ID
+	 * @param password  用户新密码
+	 */
+	public void resetPassword(int userID, String password) {
+		User user = new User();
+		user.setID(userID);
+		user.setPassword(StringUtil.string2MD5(password));
+		userDao.updateUser(user);
+	}
+	
+	/**
+	 * @param user 	用户信息
+	 */
+	public void modifyUser(User user) {
+		userDao.updateUser(user);
+	}
 }

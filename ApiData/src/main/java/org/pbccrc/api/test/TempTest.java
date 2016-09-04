@@ -88,7 +88,7 @@ public class TempTest {
 //		url.append("&fullName=王梓");
 //		url.append("&identityCard=1120103198603292638");
 		url.append("?m=open.queryScore");
-		url.append("&identityCard=1120103198603292638");
+		url.append("&identityCard=120103198603292638");
 		url.append("&appkey=NyiKvzaqtz");
 		
 		WebResource resource = client.resource(url.toString());

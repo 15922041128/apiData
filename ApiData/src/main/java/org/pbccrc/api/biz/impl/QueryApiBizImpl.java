@@ -3,6 +3,8 @@ package org.pbccrc.api.biz.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -13,6 +15,7 @@ import org.pbccrc.api.biz.query.QueryApi;
 import org.pbccrc.api.dao.DBOperator;
 import org.pbccrc.api.dao.LocalApiDao;
 import org.pbccrc.api.dao.RelationDao;
+import org.pbccrc.api.dao.RemoteApiDao;
 import org.pbccrc.api.util.Constants;
 import org.pbccrc.api.util.StringUtil;
 import org.pbccrc.api.util.Validator;
@@ -29,6 +32,9 @@ public class QueryApiBizImpl implements QueryApiBiz{
 	
 	@Autowired
 	private LocalApiDao localApiDao;
+	
+	@Autowired
+	private RemoteApiDao remoteApiDao;
 	
 	@Autowired
 	private DBOperator dbOperator;
@@ -125,11 +131,115 @@ public class QueryApiBizImpl implements QueryApiBiz{
 			}
 			
 			// 更新localApi访问次数
-			Map<String, Object> relation = relationDao.query(userID, apiKey, Integer.parseInt(String.valueOf(localApi.get("ID"))));
+			// 获得localApiID
+			int localApiID = Integer.parseInt(String.valueOf(localApi.get("ID")));
+			Map<String, Object> relation = relationDao.query(userID, apiKey, localApiID);
 			int count = Integer.parseInt(String.valueOf(relation.get("count")));
+			// 判断关系映射表count是否为-1(-1为不计查询次数)
 			if (-1 != count) {
-				String relationID = String.valueOf(relation.get("ID"));
-				relationDao.updateCount(relationID);
+				// 不是-1的情况下,更新查询次数
+				boolean updateCount = true;
+				// 判断是否为单一remoteApi
+				if (Constants.PREFIX_SINGLE.equals(isSingle)) {
+					// 单一remoteApi
+					JSONObject resultJson = JSONObject.parseObject(result);
+					// 获得远程remoteApi
+					Map<String, Object> remoteApi= remoteApiDao.getRemoteApiByLocal(localApiID).get(0);
+					String retCode = String.valueOf(remoteApi.get("retCode"));
+					JSONObject retCodeJson = JSONObject.parseObject(retCode);
+					// countCondition
+					JSONObject countCondition = retCodeJson.getJSONObject("countCondition");
+					
+					boolean isCount = countCondition.getBoolean("isCount");
+					// 判断是否更新查询次数
+					if (isCount) {
+						// 更新查询次数
+						JSONArray conditionArray = countCondition.getJSONArray("conditionArray");
+						// 判断insert条件是否为空
+						if (null == conditionArray) {
+							// 如果为空则直接更新查询次数
+						} else {
+							// 不为空则进行条件判断
+							for (Object o : conditionArray) {
+								JSONObject condition = (JSONObject)o;
+								String countConditionName = condition.getString("conditionName");
+								String countConditionValue = condition.getString("conditionValue");
+								String countConditionType = condition.getString("conditionType");
+								
+								// 获取判断用返回value值
+								String countValue = Constants.BLANK;
+								String[] keyArray = countConditionName.split(Constants.CONNECTOR_LINE);
+								// 判断条件是否为多层
+								if (keyArray.length == 1) {
+									// 单层
+									String key = keyArray[0];
+									countValue = resultJson.getString(key);
+								} else {
+									// 多层
+									JSONObject jsonObject = new JSONObject();
+									for (int n = 0; n < keyArray.length - 1; n++) {
+										if (n == 0) {
+											jsonObject = resultJson.getJSONObject(keyArray[0]);
+										} else {
+											jsonObject = jsonObject.getJSONObject(keyArray[n]);
+										}
+									}
+									String key = keyArray[keyArray.length - 1];
+									countValue = jsonObject.getString(key);
+								}
+								
+								// 判断条件类型
+								if (Constants.CONDITION_TYPE_NOTNULL.equals(countConditionType)) {
+									// notNull类型
+									if (StringUtil.isNull(countValue)) {
+										updateCount = false;
+										break;
+									}
+								} else if (Constants.CONDITION_TYPE_REGEX.equals(countConditionType)) {
+									// 正则类型
+									Pattern pattern = Pattern.compile(countConditionValue);
+									Matcher matcher = pattern.matcher(countValue);
+									if (!matcher.matches()) {
+										updateCount = false;
+										break;
+									}
+								} else {
+									// 默认为文本类型 (文本类型判断方式为equal)
+									if (!countValue.equals(countConditionValue)) {
+										updateCount = false;
+										break;
+									}
+								}
+							}
+						}
+					} else {
+						// 不更新查询次数
+						updateCount = false;
+					}
+				} else {
+					// 多个remoteApi
+					String localApiCountCode = String.valueOf(localApi.get("countCode"));
+					JSONObject localApiCountCodeJson = JSONObject.parseObject(localApiCountCode);
+					boolean isCount = localApiCountCodeJson.getBoolean("isCount");
+					if (isCount) {
+						// 获取返回数据中retrunCode
+						String retrunCode = String.valueOf(queryData.get("returnCode"));
+						// 获取conditionCode
+						String conditionCode = localApiCountCodeJson.getString("conditionCode");
+						// 比较countCode
+						if (!StringUtil.isNull(conditionCode) && conditionCode.equals(retrunCode)) {
+							updateCount = true;
+						} else {
+							updateCount = false;
+						}
+					} 
+				}
+				
+				if (updateCount) {
+					String relationID = String.valueOf(relation.get("ID"));
+					relationDao.updateCount(relationID);
+				}
+				
 			}
 			
 		} else {
@@ -152,8 +262,31 @@ public class QueryApiBizImpl implements QueryApiBiz{
 			queryApi = (QueryApi)clazz.newInstance();
 			
 			Map<String, Object> returnMap = queryApi.query(localApi, request);
-			result = String.valueOf(returnMap.get("resultStr"));
-			boolean updateCount = Boolean.parseBoolean(String.valueOf(returnMap.get("updateCount")));
+			
+			boolean updateCount = false;
+			if (Constants.PREFIX_SINGLE.equals(isSingle)) {
+				// 唯一外部api
+				result = String.valueOf(returnMap.get("resultStr"));
+				updateCount = Boolean.parseBoolean(String.valueOf(returnMap.get("updateCount")));
+			} else {
+				// 多个外部api
+				result = String.valueOf(returnMap.get("resultStr"));
+				// 获取localApi.countCode
+				String localApiCountCode = String.valueOf(localApi.get("countCode"));
+				JSONObject localApiCountCodeJson = JSONObject.parseObject(localApiCountCode);
+				boolean isCount = localApiCountCodeJson.getBoolean("isCount");
+				if (isCount) {
+					// 获取返回countCode
+					String retrunCountCode = String.valueOf(returnMap.get("countCode"));
+					// 获取conditionCode
+					String conditionCode = localApiCountCodeJson.getString("conditionCode");
+					// 比较countCode
+					if (!StringUtil.isNull(conditionCode) && conditionCode.equals(retrunCountCode)) {
+						updateCount = true;
+					}
+				} 
+			}
+			
 			if (updateCount) {
 				// 更新访问localApi次数
 				Map<String, Object> relation = relationDao.query(userID, apiKey, Integer.parseInt(String.valueOf(localApi.get("ID"))));

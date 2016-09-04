@@ -17,4 +17,8 @@ public class UserDao extends AbstractMyBatisDao{
 	public User login(User user){
 		return getSqlSession().selectOne("dao.userDao.login", user);
 	}
+	
+	public void updateUser(User user){
+		getSqlSession().update("dao.userDao.updateUser", user);
+	}
 }

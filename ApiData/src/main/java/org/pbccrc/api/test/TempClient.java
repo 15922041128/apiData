@@ -25,8 +25,12 @@ public class TempClient {
 
 		StringBuffer url = new StringBuffer();
 		url.append("http://127.0.0.1:8080/ApiData/r/queryApi/get");
+//		url.append("http://120.25.230.224:8080/ApiData/r/queryApi/get");
 //		url.append("?service=s-queryScore");
 		url.append("?service=m-sfzxx");
+//		url.append("&NAME=王梓");
+//		url.append("&IDCARDNUM=120103198603292638");
+//		url.append("&ACCOUNTNO=6214830223501445");
 		url.append("&name=王梓");
 		url.append("&idCardNo=120103198603292638");
 		

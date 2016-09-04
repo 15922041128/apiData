@@ -16,4 +16,29 @@
 		select * from user where userName = #{userName} and password = #{password} 
 	</select>
 	
+	<update id="updateUser" parameterType="org.pbccrc.api.bean.User">
+		update user
+		<set>  
+			<if test="password !=null and password != '' ">
+            	password = #{password},
+        	</if>
+        	<if test="compName !=null and compName != '' ">
+            	compName = #{compName},
+        	</if>
+        	<if test="compTel !=null and compTel != '' ">
+            	compTel = #{compTel},
+        	</if>
+        	<if test="contactName !=null and contactName != '' ">
+            	contactName = #{contactName},
+        	</if>
+        	<if test="contactTel !=null and contactTel != '' ">
+            	contactTel = #{contactTel},
+        	</if>
+        </set>
+        <where>
+			ID = #{ID}
+		</where>	
+		
+	</update>
+	
 </mapper>

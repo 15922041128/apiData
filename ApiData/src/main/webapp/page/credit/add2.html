@@ -10,6 +10,7 @@
 <script type="text/javascript" src="/ApiData/js/libs/jquery/jquery-2.1.1.min.js"></script>
 <script type="text/javascript" src="/ApiData/js/libs/sweetalert/sweetalert.min.js"></script>
 <script type="text/javascript" src="/ApiData/js/util.js"></script>
+<script type="text/javascript" src="/ApiData/js/libs/My97DatePicker/WdatePicker.js"></script>
 <script type="text/javascript">
 function toSubmit(){
 	var contactDate = $("#contactDate").val();
@@ -27,6 +28,16 @@ function toSubmit(){
 		swal("获取参数失败!");
 		return false;
 	}
+	
+	var reg = new RegExp("^[0-9]*$");
+	if(!reg.test(totalAmount)){  
+		swal("总金额情输入数字!");
+		return false;
+    }
+	if(!reg.test(balance)){  
+		swal("余额情输入数字!");
+		return false;
+    }
 	
 	var params = {"contactDate" : contactDate, "loanDate" : loanDate, "hireDate" : hireDate, "expireDate" : expireDate, 
 			"loanUsed" : loanUsed, "totalAmount" : totalAmount, "balance" : balance, "status" : status, "personID" : personID};
@@ -58,25 +69,25 @@ function toSubmit(){
 			<font class="regist_text span-14"><label class="span-red">
 					*
 			</label> 合同日期：</font>
-			<input maxlength="30" id="contactDate" type="text" class="login_input">
+			<input maxlength="30" id="contactDate" type="text" class="login_input" onClick="WdatePicker()">
 		</li>
 		<li class=" margin_top_20 height32">
 			<font class="regist_text span-14"><label class="span-red">
 					*
 			</label> 放款日期：</font>
-			<input maxlength="30" id="loanDate" type="text" class="login_input">
+			<input maxlength="30" id="loanDate" type="text" class="login_input" onClick="WdatePicker()">
 		</li>
 		<li class=" margin_top_20 height32">
 			<font class="regist_text span-14"><label class="span-red">
 					*
 			</label> 起租日：</font>
-			<input maxlength="30" id="hireDate" type="text" class="login_input">
+			<input maxlength="30" id="hireDate" type="text" class="login_input" onClick="WdatePicker()">
 		</li>
 		<li class=" margin_top_20 height32">
 			<font class="regist_text span-14"><label class="span-red">
 					*
 			</label> 到期日：</font>
-			<input maxlength="30" id="expireDate" type="text" class="login_input">
+			<input maxlength="30" id="expireDate" type="text" class="login_input" onClick="WdatePicker()">
 		</li>
 		<li class=" margin_top_20 height32">
 			<font class="regist_text span-14"><label class="span-red">
@@ -100,7 +111,12 @@ function toSubmit(){
 			<font class="regist_text span-14"><label class="span-red">
 					*
 			</label> 状态：</font>
-			<input maxlength="60" id="status" type="text" class="login_input">
+			<select id="status" class="open_select_box">
+				<option value="正常">正常</option>
+				<option value="逾期">逾期</option>
+				<option value="结清">结清</option>
+				<option value="呆账">呆账</option>
+			</select>
 		</li>
 		
 		<li class="padding_top_30">
