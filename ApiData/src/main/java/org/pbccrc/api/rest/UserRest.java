@@ -15,8 +15,6 @@ import org.pbccrc.api.util.Constants;
 import org.pbccrc.api.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.alibaba.fastjson.JSONObject;
-
 @Path("/user")
 public class UserRest {
 	

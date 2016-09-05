@@ -6,15 +6,15 @@
 <link rel="stylesheet" type="text/css" href="css/new.css"/>
 <link rel="stylesheet" type="text/css" href="css/page.css"/>
 <link rel="stylesheet" type="text/css" href="css/sweetalert/sweetalert.css">
+<link rel="stylesheet" type="text/css" href="css/slide-unlock.css">
 <script type="text/javascript" src="js/pe.js"></script>
 <script type="text/javascript" src="js/libs/jquery/jquery-2.1.1.min.js"></script>
+<script type="text/javascript" src="js/libs/jquery/jquery.slideunlock.js"></script>
 <script type="text/javascript" src="js/input_notice.js"></script>
 <script type="text/javascript" src="js/vcode.js"></script>
 <script type="text/javascript" src="js/libs/sweetalert/sweetalert.min.js"></script>
 <script>
 	onload = function () {
-		var container = document.getElementById("vCode");
-		var code = new vCode(container);
 		document.getElementById("btn").addEventListener("click", function () {
 			
 			var userName = $('#userName').val();
@@ -60,30 +60,32 @@
 				return false;
 			}
 			
-			if (code.verify(document.getElementById("code").value)) {
-				
-				var params = {
-								"userName" : userName, 
-								"password" : password, 
-								"compName" : compName,
-								"compTel" : compTel,
-								"contactName" : contactName,
-								"contactTel" : contactTel};
-				
-				 $.ajax({
-	                async:false,
-	                type: "GET",  
-	                url: "r/user/register",  
-	                data: params,
-	                success: function(msg){
-	                	alert("注册成功");
-	                	parent.$("#conFrame").attr("src", "login.html"); 
-	                }  
-	            });
-				
-			} else {
-				swal("验证码不正确,请重新输入");
+			var silderValue = $('#silderValue').val();
+			if (silderValue == 'n') {
+				swal("请拖动滑块进行验证");
+				return false;
 			}
+			
+			var params = {
+							"userName" : userName, 
+							"password" : password, 
+							"compName" : compName,
+							"compTel" : compTel,
+							"contactName" : contactName,
+							"contactTel" : contactTel};
+			
+			 $.ajax({
+                async:false,
+                type: "GET",  
+                url: "r/user/register",  
+                data: params,
+                success: function(msg){
+                	alert("注册成功");
+                	parent.$("#conFrame").attr("src", "login.html"); 
+                }  
+            });
+				
+			
 		}, false);
 	};
 	
@@ -188,17 +190,32 @@ function displayYesCurrent(obj){
 							<span class="notice1 span-grey">请填联系人电话</span>
 							<span></span>
 						</li>
+						
 						<li class="margin_top_20 height32">
 							<font class="regist_text span-14"><label class="span-red">
 									*
 							</label> 验证码 ：</font>
-							<input maxlength="18" id="code" type="text" class="login_input" onfocus="displayYes(this)" onblur="displayNo(this);" autocomplete="off">
-							<div id="vCode" style="width: 100px; height: 30px; border: 1px solid #ccc; display: inline-block;"></div>
+							<div id="demo">
+							<div id="slider">
+							    <div id="slider_bg"></div>
+							    <span id="label">>></span> <span id="labelTip">拖动滑块验证</span> </div>
+								  <script>
+								    $(function () {
+								        var slider = new SliderUnlock("#slider",{
+												successLabelTip : "验证成功"	
+											},function(){
+												$('#silderValue').val('y');
+								        	});
+								        slider.init();
+								    })
+								</script> 
+							</div>
 						</li>
 						
 						<li class="padding_top_30">
 							<font class="regist_text">&nbsp;</font>
-							<input type="button" class="inputBtn btn2" id="btn" value="注册">
+							<input type="hidden" id="silderValue" value="n">
+							<input type="button" class="inputBtn btn2" id="btn" value="注册" disabled="disabled">
 						</li>
 					</ul>
 				</div>

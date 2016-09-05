@@ -27,7 +27,7 @@ public class RemoteApiOperator {
 		ClientConfig config = new DefaultClientConfig();
 		config.getProperties().put(ClientConfig.PROPERTY_CONNECT_TIMEOUT, 10 * 1000);
 		Client client = Client.create(config);
-
+		
 		WebResource resource = client.resource(url);
 		
 		String result = resource.accept(MediaType.APPLICATION_JSON_TYPE, MediaType.APPLICATION_XML_TYPE).get(String.class);

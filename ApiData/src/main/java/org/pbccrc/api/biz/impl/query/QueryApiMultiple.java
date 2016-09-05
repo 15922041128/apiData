@@ -1,5 +1,6 @@
 package org.pbccrc.api.biz.impl.query;
 
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -257,7 +258,7 @@ public class QueryApiMultiple implements QueryApi {
 				// 不加密
 				for (String key : paramMap.keySet()) {
 					String value = String.valueOf(paramMap.get(key));
-					url += Constants.URL_PARAM_CONNECTOR + key + Constants.EQUAL + value;
+					url += Constants.URL_PARAM_CONNECTOR + key + Constants.EQUAL + URLEncoder.encode(value, "utf-8");
 				}
 				returnStr = remoteApiOperator.remoteAccept(url);
 			} else if (Constants.ENCRYPT_TYPE_QL.equals(encryptType)) {
