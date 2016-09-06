@@ -29,15 +29,52 @@ function toSubmit(){
 		return false;
 	}
 	
-	var reg = new RegExp("^[0-9]*$");
-	if(!reg.test(totalAmount)){  
-		swal("总金额情输入数字!");
+	if (contactDate == '') {
+		swal("请填写合同日期!");
 		return false;
-    }
-	if(!reg.test(balance)){  
-		swal("余额情输入数字!");
+	}
+	
+	if (loanDate == '') {
+		swal("请填写放款日期!");
 		return false;
-    }
+	}
+	
+	if (hireDate == '') {
+		swal("请填写起租日!");
+		return false;
+	}
+	
+	if (expireDate == '') {
+		swal("请填写到期日!");
+		return false;
+	}
+	
+	if (loanUsed == '') {
+		swal("请填写贷款用途!");
+		return false;
+	}
+	
+	if (totalAmount == '') {
+		swal("请填写总金额!");
+		return false;
+	} else {
+		var reg = new RegExp("^[0-9]*$");
+		if(!reg.test(totalAmount)){  
+			swal("总金额请输入数字!");
+			return false;
+	    }
+	}
+	
+	
+	if (balance == '') {
+		swal("请填写余额!");
+		return false;
+	} else {
+		if(!reg.test(balance)){  
+			swal("余额请输入数字!");
+			return false;
+	    }
+	}
 	
 	var params = {"contactDate" : contactDate, "loanDate" : loanDate, "hireDate" : hireDate, "expireDate" : expireDate, 
 			"loanUsed" : loanUsed, "totalAmount" : totalAmount, "balance" : balance, "status" : status, "personID" : personID};
@@ -49,7 +86,8 @@ function toSubmit(){
         data: params,
         success: function(msg){  
         	if ('Y' == msg) {
-        		window.location.href = getLocation() + "/page/credit/query.html"; 
+        		alert("报送成功");
+        		window.location.href = getLocation() + "/page/credit/add.html"; 
         	} else {
         		swal("报送失败!请重新填写!");
         	}

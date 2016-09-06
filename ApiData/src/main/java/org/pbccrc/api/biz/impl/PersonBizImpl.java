@@ -16,6 +16,7 @@ import org.pbccrc.api.dao.PBaseInfoDao;
 import org.pbccrc.api.dao.PPersonDao;
 import org.pbccrc.api.dao.PReditDao;
 import org.pbccrc.api.util.Constants;
+import org.pbccrc.api.util.RemoteApiOperator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,7 +37,7 @@ public class PersonBizImpl implements PersonBiz {
 	
 	@Autowired
 	private DBOperator dbOperator;
-
+	
 	/**
 	 * @param name          姓名
 	 * @param idCardNo		身份证号
@@ -159,6 +160,11 @@ public class PersonBizImpl implements PersonBiz {
 		} else {
 			returnObj.put("pBaseInfo", pBaseInfoList.get(0));
 		}
+		
+		// 获取用户信用评分信息
+		String score = "0"; 
+		String url = "http://www.qilingyz.com/api.php?m=open.queryScore&identityCard=" + idCardNo;
+		returnObj.put("score", score);
 		
 		// 获取用户信贷信息
 		List<Map<String, Object>> reditList = pReditDao.queryAll(personID);

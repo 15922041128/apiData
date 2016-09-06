@@ -100,34 +100,63 @@ $(document).ready(function() {
 	        	// 失信人被执行信息
 	        	var dishonestList = datas.dishonestList;
 	        	var dishonestTable = $("#dishonestTable");
-	        	$.each(dishonestList, function (i, data) {
+	        	if (0 == dishonestList.length) {
 	        		var tr1 = "<tr class='odd-row'>";
-	        		tr1 = tr1 + "<th class='first'>" + "<b>被执行人姓名</b>：" + data.INAME + "</th>";
-	        		tr1 = tr1 + "<th style='text-align:left;line-height:20px'>" + "被执行人身份证号码：" + data.CARDNUM  + "</th>";
-	        		tr1 = tr1 + "<th style='text-align:left'>" + "省份：" + data.AREA_NAME + "</th>";
-	        		tr1 = tr1 + "<th>" + "发布时间：" + data.REG_DATE  + "</th>";
+	        		tr1 = tr1 + "<th class='first'>" + "<b>被执行人姓名</b>：" + '' + "</th>";
+	        		tr1 = tr1 + "<th style='text-align:left;line-height:20px'>" + "被执行人身份证号码：" + '' + "</th>";
+	        		tr1 = tr1 + "<th style='text-align:left'>" + "省份：" + '' + "</th>";
+	        		tr1 = tr1 + "<th>" + "发布时间：" + ''  + "</th>";
 	        		tr1 = tr1 + "</tr>"
 	        		dishonestTable.append(tr1);
 	        		
 	        		var tr2 = "<tr>";
-	        		tr2 = tr2 + "<td style='text-align:left;line-height:20px'>" + "<b>执行依据号：</b>" + data.GIST_CID + "</td>";
-	        		tr2 = tr2 + "<td style='text-align:left'>" + "<b>被执行人的履行情况：</b>" + data.PERFORMANCE + "</td>";
-	        		tr2 = tr2 + "<td colspan='2' style='text-align:left'>" + "<b>执行法院：</b>" + data.COURT_NAME + "</td>";
+	        		tr2 = tr2 + "<td style='text-align:left;line-height:20px'>" + "<b>执行依据号：</b>" + '' + "</td>";
+	        		tr2 = tr2 + "<td style='text-align:left'>" + "<b>被执行人的履行情况：</b>" + '' + "</td>";
+	        		tr2 = tr2 + "<td colspan='2' style='text-align:left'>" + "<b>执行法院：</b>" + '' + "</td>";
 	        		tr2 = tr2 + "</tr>";
 	        		dishonestTable.append(tr2);
 	        		
 	        		var tr3 = "<tr>";
-	        		tr3 = tr3 + "<td colspan='4' style='text-align:left;line-height:20px'>" + "<b>生效法律文书确定的义务：</b>" + data.DUTY + "</td>";
+	        		tr3 = tr3 + "<td colspan='4' style='text-align:left;line-height:20px'>" + "<b>生效法律文书确定的义务：</b>" + '' + "</td>";
 	        		tr3 = tr3 + "</tr>";
 	        		dishonestTable.append(tr3);
 	        		
 	        		var tr4 = "<tr>";
-	        		tr4 = tr4 + "<td colspan='4' style='text-align:left;line-height:20px'>" + "<b>失信被执行人行为具体情形：</b>" + data.DISREPUT_TYPE_NAME + "</td>";
+	        		tr4 = tr4 + "<td colspan='4' style='text-align:left;line-height:20px'>" + "<b>失信被执行人行为具体情形：</b>" + '' + "</td>";
 	        		tr4 = tr4 + "</tr>";
 	        		dishonestTable.append(tr4);
 	        		
 	        		dishonestTable.append("<tr><td colspan='4'></td></tr>");
-	        	});
+	        	} else {
+	        		$.each(dishonestList, function (i, data) {
+		        		var tr1 = "<tr class='odd-row'>";
+		        		tr1 = tr1 + "<th class='first'>" + "<b>被执行人姓名</b>：" + data.INAME + "</th>";
+		        		tr1 = tr1 + "<th style='text-align:left;line-height:20px'>" + "被执行人身份证号码：" + data.CARDNUM  + "</th>";
+		        		tr1 = tr1 + "<th style='text-align:left'>" + "省份：" + data.AREA_NAME + "</th>";
+		        		tr1 = tr1 + "<th>" + "发布时间：" + data.REG_DATE  + "</th>";
+		        		tr1 = tr1 + "</tr>"
+		        		dishonestTable.append(tr1);
+		        		
+		        		var tr2 = "<tr>";
+		        		tr2 = tr2 + "<td style='text-align:left;line-height:20px'>" + "<b>执行依据号：</b>" + data.GIST_CID + "</td>";
+		        		tr2 = tr2 + "<td style='text-align:left'>" + "<b>被执行人的履行情况：</b>" + data.PERFORMANCE + "</td>";
+		        		tr2 = tr2 + "<td colspan='2' style='text-align:left'>" + "<b>执行法院：</b>" + data.COURT_NAME + "</td>";
+		        		tr2 = tr2 + "</tr>";
+		        		dishonestTable.append(tr2);
+		        		
+		        		var tr3 = "<tr>";
+		        		tr3 = tr3 + "<td colspan='4' style='text-align:left;line-height:20px'>" + "<b>生效法律文书确定的义务：</b>" + data.DUTY + "</td>";
+		        		tr3 = tr3 + "</tr>";
+		        		dishonestTable.append(tr3);
+		        		
+		        		var tr4 = "<tr>";
+		        		tr4 = tr4 + "<td colspan='4' style='text-align:left;line-height:20px'>" + "<b>失信被执行人行为具体情形：</b>" + data.DISREPUT_TYPE_NAME + "</td>";
+		        		tr4 = tr4 + "</tr>";
+		        		dishonestTable.append(tr4);
+		        		
+		        		dishonestTable.append("<tr><td colspan='4'></td></tr>");
+		        	});
+	        	}
 	        }  
 	    });
 });
@@ -146,6 +175,9 @@ $(document).ready(function() {
 			<td>
 				身份证号：<label id="pp_idCardNo"></label>
 			</td>
+			<td>
+				信用平分：<label id=""></label>
+			</td>
 			<td rowspan="2" style="width:100px">
 				<img src="" height="100" width="80" id="pbi_photo" />
 			</td>
@@ -154,7 +186,7 @@ $(document).ready(function() {
 			<td>
 				手机号：<label id="pbi_tel"></label>
 			</td>
-			<td>
+			<td colspan="2">
 				地址：<label id="pbi_address"></label>
 			</td>
 		</tr>

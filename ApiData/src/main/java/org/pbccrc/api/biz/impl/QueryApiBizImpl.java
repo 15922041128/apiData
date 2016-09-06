@@ -155,7 +155,7 @@ public class QueryApiBizImpl implements QueryApiBiz{
 					if (isCount) {
 						// 更新查询次数
 						JSONArray conditionArray = countCondition.getJSONArray("conditionArray");
-						// 判断insert条件是否为空
+						// 判断isCount条件是否为空
 						if (null == conditionArray) {
 							// 如果为空则直接更新查询次数
 						} else {
@@ -241,7 +241,7 @@ public class QueryApiBizImpl implements QueryApiBiz{
 				}
 				
 			}
-			
+		
 		} else {
 			// 本地api无数据 查询外部api
 			

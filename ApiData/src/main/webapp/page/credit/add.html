@@ -11,7 +11,7 @@
 <script type="text/javascript" src="/ApiData/js/libs/jquery/jquery-2.1.1.min.js"></script>
 <script type="text/javascript" src="/ApiData/js/util.js"></script>
 <script type="text/javascript" src="/ApiData/js/validator.js"></script>
-<script type="text/javascript" src="/ApiData/js/city.js"></script>
+<script type="text/javascript" src="/ApiData/js/city2.js"></script>
 <script type="text/javascript" src="/ApiData/js/picview.js"></script>
 <script type="text/javascript" src="/ApiData/js/libs/sweetalert/sweetalert.min.js"></script>
 <script type="text/javascript">
@@ -19,8 +19,9 @@ function toNext(){
 	var name = $("#name").val();
 	var idCardNo = $("#idCardNo").val();
 	var tel = $("#tel").val();
-	var selProvince = $("#selProvince").val();
-	var selCity = $("#selCity").val();
+	var cmbProvince = $("#cmbProvince").val();
+	var cmbCity = $("#cmbCity").val();
+	var cmbArea = $("#cmbArea").val();
 	var address = $("#address").val();
 	
 	var res = validIdCardNo(idCardNo);
@@ -35,13 +36,18 @@ function toNext(){
 		return false;	
 	}
 	
-	if ('' == selProvince) {
+	if ('' == cmbProvince) {
 		swal("请选择省份");
 		return false;
 	}
 	
-	if ('' == selCity) {
+	if ('' == cmbCity) {
 		swal("请选择城市");
+		return false;
+	}
+	
+	if ('' == cmbArea) {
+		swal("请选择区");
 		return false;
 	}
 	
@@ -50,7 +56,7 @@ function toNext(){
 		return false;
 	}
 	
-	address = selProvince + selCity + address;
+	address = cmbProvince + cmbCity + cmbArea + address;
 	
 	var urlParam = encodeURI(encodeURI("?name=" + name + "&idCardNo=" + idCardNo + "&tel=" + tel + "&address=" + address));
 	
@@ -114,7 +120,6 @@ function getFileName(obj) {
 		</li>
 		<li class=" margin_top_20 height32">
 			<font class="regist_text span-14"><label class="span-red">
-					*
 			</label> 照片：</font>
 			<input maxlength="30" name="photo" fileindex="1" type="file" onchange="imageChange(this)" >
 			<div id="divPreview1" ><img id="imgHeadPhoto1"  height="100" width="80" alt="照片预览"/></div>
@@ -130,51 +135,13 @@ function getFileName(obj) {
 			<font class="regist_text span-14"><label class="span-red">
 					*
 			</label> 地址：</font>
-			<select id="selProvince" onChange = "getCity(this.options[this.selectedIndex].value)" class="open_select_box"> 
-			  <option value="">-请选择-</option> 
-			  <option value="北京市">北京市</option> 
-			  <option value="上海市">上海市</option> 
-			  <option value="天津市">天津市</option> 
-			  <option value="重庆市">重庆市</option> 
-			  <option value="河北省">河北省</option> 
-			  <option value="山西省">山西省</option> 
-			  <option value="内蒙古自治区">内蒙古自治区</option> 
-			  <option value="辽宁省">辽宁省</option> 
-			  <option value="吉林省">吉林省</option> 
-			  <option value="黑龙江省">黑龙江省</option> 
-			  <option value="江苏省">江苏省</option> 
-			  <option value="浙江省">浙江省</option> 
-			  <option value="安徽省">安徽省</option> 
-			  <option value="福建省">福建省</option> 
-			  <option value="江西省">江西省</option> 
-			  <option value="山东省">山东省</option> 
-			  <option value="河南省">河南省</option> 
-			  <option value="湖北省">湖北省</option> 
-			  <option value="湖南省">湖南省</option> 
-			  <option value="广东省">广东省</option> 
-			  <option value="广西壮族自治区">广西壮族自治区</option> 
-			  <option value="海南省">海南省</option> 
-			  <option value="四川省">四川省</option> 
-			  <option value="贵州省">贵州省</option> 
-			  <option value="云南省">云南省</option> 
-			  <option value="西藏自治区">西藏自治区</option> 
-			  <option value="陕西省">陕西省</option> 
-			  <option value="甘肃省">甘肃省</option> 
-			  <option value="宁夏回族自治区">宁夏回族自治区</option> 
-			  <option value="青海省">青海省</option> 
-			  <option value="新疆维吾尔族自治区">新疆维吾尔族自治区</option> 
-			  <option value="香港特别行政区">香港特别行政区</option> 
-			  <option value="澳门特别行政区">澳门特别行政区</option> 
-			  <option value="台湾省">台湾省</option> 
-			  <option value="其它">其它</option> 
-			 </select> 
-		</li>
-		<li class=" margin_top_20 height32">
-			<font class="regist_text span-14"><label class="span-red">
-			</label></font>
-			 <select id="selCity" class="open_select_box"> 
-			  	<option value="0">-请选择-</option> 
-			 </select> 
+			
+			<select id="cmbProvince" class="open_select"></select>  
+            <select id="cmbCity" class="open_select"></select>  
+            <select id="cmbArea" class="open_select"></select>  
+            <script type="text/javascript">  
+                  addressInit('cmbProvince', 'cmbCity', 'cmbArea');  
+            </script>  
 		</li>
 		<li class=" margin_top_20 height32">
 			<font class="regist_text span-14"><label class="span-red">

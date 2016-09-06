@@ -1,7 +1,7 @@
 package org.pbccrc.api.util;
 
 public class Constants {
-
+	
 	public static final int COUNT_MAX = -1;
 	
 	public static final String BLANK = "";

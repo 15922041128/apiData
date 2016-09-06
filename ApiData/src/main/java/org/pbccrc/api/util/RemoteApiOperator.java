@@ -74,4 +74,6 @@ public class RemoteApiOperator {
 		
 		return lineString;
 	}
+	
+	// 内部访问
 }
