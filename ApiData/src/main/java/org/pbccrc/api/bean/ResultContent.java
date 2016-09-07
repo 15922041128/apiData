@@ -13,7 +13,7 @@ public class ResultContent {
 	
 	public String toString() {
 		
-		return "{errNum : " + errNum + ", retMsg : " + retMsg + ", retData :" + retData + "}";
+		return "{'errNum' : '" + errNum + "', 'retMsg' : '" + retMsg + "', 'retData' :'" + retData + "'}";
 		
 	}
 

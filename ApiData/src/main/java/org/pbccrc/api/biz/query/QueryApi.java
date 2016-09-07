@@ -2,15 +2,14 @@ package org.pbccrc.api.biz.query;
 
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-
 public interface QueryApi {
 
 	/**
 	 * @param localApi		  本地api	
-	 * @param request		  请求request	
+	 * @param urlParams		  请求参数
 	 * @return
 	 * @throws Exception
 	 */
-	public Map<String, Object> query(Map<String, Object> localApi, HttpServletRequest request) throws Exception;
+	@SuppressWarnings("rawtypes")
+	public String query(Map<String, Object> localApi, Map urlParams) throws Exception;
 }

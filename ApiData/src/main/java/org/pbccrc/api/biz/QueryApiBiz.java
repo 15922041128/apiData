@@ -1,9 +1,10 @@
 package org.pbccrc.api.biz;
 
-import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
 public interface QueryApiBiz {
 	
-	public String query(String service, HttpServletRequest request) throws Exception;
+	@SuppressWarnings("rawtypes")
+	public String query(String service, Map<String, Object> localApi, Map urlParams) throws Exception;
 
 }

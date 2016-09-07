@@ -7,10 +7,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.pbccrc.api.bean.DBEntity;
-import org.pbccrc.api.bean.ResultContent;
 import org.pbccrc.api.biz.query.QueryApi;
 import org.pbccrc.api.dao.DBOperator;
 import org.pbccrc.api.dao.RemoteApiDao;
@@ -41,17 +38,9 @@ public class QueryApiSingle implements QueryApi {
 
 	@Override
 	@SuppressWarnings("rawtypes")
-	public Map<String, Object> query(Map<String, Object> localApi, HttpServletRequest request) throws Exception{
+	public String query(Map<String, Object> localApi, Map urlParams) throws Exception{
 		
-		Map<String, Object> returnMap = new HashMap<String, Object>();
-
 		String resultStr = Constants.BLANK;
-		
-		// 获得url参数
-		Map urlParams = request.getParameterMap();
-		
-		// 返回信息对象
-		ResultContent resultContent = new ResultContent();
 		
 		// 本地api参数
 		String localParams = String.valueOf(localApi.get("params"));
@@ -61,8 +50,6 @@ public class QueryApiSingle implements QueryApi {
 		List<Map<String, Object>> remoteApiList = remoteApiDao.getRemoteApiByLocal(Integer.parseInt(String.valueOf(localApi.get("ID"))));
 		Map<String, Object> remoteApi = remoteApiList.get(0);
 		
-		// remoteID
-		int id = Integer.parseInt(String.valueOf(remoteApi.get("ID")));
 		// url
 		String url = String.valueOf(remoteApi.get("url"));
 		// 远程api访问参数
@@ -79,18 +66,6 @@ public class QueryApiSingle implements QueryApi {
 		String encryptType = String.valueOf(remoteApi.get("encryptType"));
 		// 返回参数
 		String retCode = String.valueOf(remoteApi.get("retCode"));
-		// 剩余查询次数
-		int count = Integer.parseInt(String.valueOf(remoteApi.get("count")));
-		
-		// 判断是否超过查询次数
-		if (count == 0) {
-			resultContent.setErrNum(Constants.ERR_CNT);
-			resultContent.setRetMsg(Constants.RET_MSG_CNT);
-			resultStr = JSONObject.toJSONString(resultContent);
-			returnMap.put("resultStr", resultStr);
-			returnMap.put("updateCount", false);
-			return returnMap;
-		}
 		
 		// 远程访问参数列表
 		Map<String, Object> paramMap = new HashMap<String, Object>();
@@ -242,7 +217,6 @@ public class QueryApiSingle implements QueryApi {
 			// 全联加密
 			resultStr = remoteApiOperator.qlRemoteAccept(encryptKey, url, paramMap);
 		}
-		returnMap.put("resultStr", resultStr);
 		
 		// 解析返回结果
 		JSONObject resultJson = JSONObject.parseObject(resultStr);
@@ -252,8 +226,6 @@ public class QueryApiSingle implements QueryApi {
 		JSONArray successConditionArray = retCodeJson.getJSONArray("successCondition");
 		// 获取insertCondition
 		JSONObject insertConditionJson = retCodeJson.getJSONObject("insertCondition");
-		// countCondition
-		JSONObject countCondition = retCodeJson.getJSONObject("countCondition");
 		
 		// 判断是否成功
 		boolean isSuccess = true;
@@ -321,8 +293,6 @@ public class QueryApiSingle implements QueryApi {
 					// 如果为空直接插入数据库
 					// 插入数据库
 					insertDB(localApi, resultStr, localParamArray, urlParams);
-					// 更新访问次数
-					remoteApiDao.updateCnt(id, --count);
 				} else {
 					// 不为空则进行条件判断
 					for (Object o : conditionArray) {
@@ -380,86 +350,12 @@ public class QueryApiSingle implements QueryApi {
 					if (isertDB) {
 						// 插入数据库
 						insertDB(localApi, resultStr, localParamArray, urlParams);
-						// 更新访问次数
-						remoteApiDao.updateCnt(id, --count);
 					}
-					
 				}
-			}
-			
-			// 判断是否更新查询次数
-			boolean isCount = countCondition.getBoolean("isCount");
-			if (isCount) {
-				boolean updateCount = true;
-				JSONArray conditionArray = countCondition.getJSONArray("conditionArray");
-				// 判断更新 次数条件是否为空
-				if (null == conditionArray) {
-					// 如果为空则直接更新查询次数
-					// 更新查询次数
-					returnMap.put("updateCount", updateCount);
-				} else {
-					// 不为空则进行条件判断
-					for (Object o : conditionArray) {
-						JSONObject condition = (JSONObject)o;
-						String countConditionName = condition.getString("conditionName");
-						String countConditionValue = condition.getString("conditionValue");
-						String countConditionType = condition.getString("conditionType");
-						
-						// 获取判断用返回value值
-						String countValue = Constants.BLANK;
-						String[] keyArray = countConditionName.split(Constants.CONNECTOR_LINE);
-						// 判断条件是否为多层
-						if (keyArray.length == 1) {
-							// 单层
-							String key = keyArray[0];
-							countValue = resultJson.getString(key);
-						} else {
-							// 多层
-							JSONObject jsonObject = new JSONObject();
-							for (int n = 0; n < keyArray.length - 1; n++) {
-								if (n == 0) {
-									jsonObject = resultJson.getJSONObject(keyArray[0]);
-								} else {
-									jsonObject = jsonObject.getJSONObject(keyArray[n]);
-								}
-							}
-							String key = keyArray[keyArray.length - 1];
-							countValue = jsonObject.getString(key);
-						}
-						
-						// 判断条件类型
-						if (Constants.CONDITION_TYPE_NOTNULL.equals(countConditionType)) {
-							// notNull类型
-							if (StringUtil.isNull(countValue)) {
-								updateCount = false;
-								break;
-							}
-						} else if (Constants.CONDITION_TYPE_REGEX.equals(countConditionType)) {
-							// 正则类型
-							Pattern pattern = Pattern.compile(countConditionValue);
-							Matcher matcher = pattern.matcher(countValue);
-							if (!matcher.matches()) {
-								updateCount = false;
-								break;
-							}
-						} else {
-							// 默认为文本类型 (文本类型判断方式为equal)
-							if (!countValue.equals(countConditionValue)) {
-								updateCount = false;
-								break;
-							}
-						}
-					}
-					// 更新查询次数
-					returnMap.put("updateCount", updateCount);
-				} 
-			} else {
-				// 不更新查询次数
-				returnMap.put("updateCount", false);
 			}
 		}
 		
-		return returnMap;
+		return resultStr;
 	}
 
 	@SuppressWarnings("rawtypes")

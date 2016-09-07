@@ -125,4 +125,8 @@ public class Constants {
 	public static final String CONDITION_TYPE_NOTNULL = "notNull";
 	public static final String CONDITION_TYPE_TEXT = "text";
 	public static final String CONDITION_TYPE_REGEX = "regex";
+	
+	/** cost type */
+	public static final String COST_TYPE_COUNT = "count";
+	public static final String COST_TYPE_PRICE = "price";
 }

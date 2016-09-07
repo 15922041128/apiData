@@ -6,8 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.pbccrc.api.bean.DBEntity;
 import org.pbccrc.api.bean.ResultContent;
 import org.pbccrc.api.biz.query.QueryApi;
@@ -45,9 +43,7 @@ public class QueryApiMultiple implements QueryApi {
 
 	@Override
 	@SuppressWarnings("rawtypes")
-	public Map<String, Object> query(Map<String, Object> localApi, HttpServletRequest request) throws Exception {
-		
-		Map<String, Object> returnMap = new HashMap<String, Object>();
+	public String query(Map<String, Object> localApi, Map urlParams) throws Exception {
 		
 		// 返回字符串
 		String resultStr = Constants.BLANK;
@@ -56,9 +52,6 @@ public class QueryApiMultiple implements QueryApi {
 		ResultContent resultContent = new ResultContent();
 		resultContent.setErrNum(Constants.CODE_ERR_SUCCESS);
 		resultContent.setRetMsg(Constants.CODE_ERR_SUCCESS_MSG);
-		
-		// 获取url参数
-		Map urlParams = request.getParameterMap();
 		
 		// 本地api请求参数
 		String localParams = String.valueOf(localApi.get("params"));
@@ -72,8 +65,6 @@ public class QueryApiMultiple implements QueryApi {
 			
 			Map<String, Object> remoteApi = remoteApiList.get(i);
 			
-			// remoteID
-			int id = Integer.parseInt(String.valueOf(remoteApi.get("ID")));
 			// url
 			String url = String.valueOf(remoteApi.get("url"));
 			// 远程api访问参数
@@ -90,20 +81,9 @@ public class QueryApiMultiple implements QueryApi {
 			String encryptType = String.valueOf(remoteApi.get("encryptType"));
 			// 返回参数
 			String retCode = String.valueOf(remoteApi.get("retCode"));
-			// 剩余查询次数
-			int count = Integer.parseInt(String.valueOf(remoteApi.get("count")));
 			// 返回值对应关系
 			String retParamRel = String.valueOf(remoteApi.get("retParamRel"));
 			
-			// 判断是否超过查询次数
-			if (count == 0) {
-				resultContent.setErrNum(Constants.ERR_CNT);
-				resultContent.setRetMsg(Constants.RET_MSG_CNT);
-				resultStr = JSONObject.toJSONString(resultContent);
-				returnMap.put("resultStr", resultStr);
-				returnMap.put("countCode", Constants.ERR_CNT);
-				return returnMap;
-			}
 			
 			// 远程访问参数列表
 			Map<String, Object> paramMap = new HashMap<String, Object>();
@@ -208,10 +188,7 @@ public class QueryApiMultiple implements QueryApi {
 					if (null == urlParams.get(paramName)) {
 						resultContent.setErrNum(Constants.ERR_URL_INVALID);
 						resultContent.setRetMsg(Constants.RET_MSG_URL_INVALID + paramName);
-						resultStr = JSONObject.toJSONString(resultContent);
-						returnMap.put("resultStr", resultStr);
-						returnMap.put("countCode", Constants.ERR_URL_INVALID);
-						return returnMap;
+						return resultContent.toString();
 					}
 					// 设置远程访问参数
 					paramMap.put(paramName, ((String[])urlParams.get(paramName))[0]);
@@ -272,9 +249,7 @@ public class QueryApiMultiple implements QueryApi {
 				Map<String, Object> code = codeDao.queryByCode(Constants.CODE_ERR_FAIL);
 				resultContent.setErrNum(Constants.CODE_ERR_FAIL);
 				resultContent.setRetMsg(String.valueOf(code.get("codeValue")));
-				returnMap.put("resultStr", resultContent);
-				returnMap.put("countCode", Constants.CODE_ERR_FAIL);
-				return returnMap;
+				return resultContent.toString();
 			}
 			
 			
@@ -292,9 +267,7 @@ public class QueryApiMultiple implements QueryApi {
 					Map<String, Object> code = codeDao.queryByCode(Constants.CODE_ERR_FAIL);
 					resultContent.setErrNum(Constants.CODE_ERR_FAIL);
 					resultContent.setRetMsg(String.valueOf(code.get("codeValue")));
-					returnMap.put("resultStr", resultContent);
-					returnMap.put("countCode", Constants.CODE_ERR_FAIL);
-					return returnMap;
+					return resultContent.toString();
 				} else {
 					continue;
 				}
@@ -302,11 +275,6 @@ public class QueryApiMultiple implements QueryApi {
 			
 			JSONObject codeValue = retCodeJson.getJSONObject("codeValue");
 			JSONObject insertCondition = retCodeJson.getJSONObject("insertCondition");
-			
-//			String codeName = null;
-//			if (codeNames.length == 1) {
-//				codeName = codeNames[0];
-//			}
 			
 			// 判断code值是否存在
 			String returnCode = returnJson.getString(codeName);
@@ -316,9 +284,7 @@ public class QueryApiMultiple implements QueryApi {
 					Map<String, Object> code = codeDao.queryByCode(Constants.CODE_ERR_FAIL);
 					resultContent.setErrNum(Constants.CODE_ERR_FAIL);
 					resultContent.setRetMsg(String.valueOf(code.get("codeValue")));
-					returnMap.put("resultStr", resultContent);
-					returnMap.put("countCode", Constants.CODE_ERR_FAIL);
-					return returnMap;
+					return resultContent.toString();
 				} else {
 					continue;
 				}
@@ -335,9 +301,7 @@ public class QueryApiMultiple implements QueryApi {
 					Map<String, Object> code = codeDao.queryByCode(Constants.CODE_ERR_FAIL);
 					resultContent.setErrNum(Constants.CODE_ERR_FAIL);
 					resultContent.setRetMsg(String.valueOf(code.get("codeValue")));
-					returnMap.put("resultStr", resultContent);
-					returnMap.put("countCode", Constants.CODE_ERR_FAIL);
-					return returnMap;
+					return resultContent.toString();
 				} else {
 					continue;
 				}
@@ -352,14 +316,13 @@ public class QueryApiMultiple implements QueryApi {
 				
 				// 判断是否成功
 				if (Constants.RET_CODE_SUCCESS.equals(codeStatus)) {
-					returnMap.put("countCode", Constants.CODE_ERR_SUCCESS);
 					// success
 					// 如果插入条件为空,则直接插入数据库
 					if (null == insertCondition) {
 						// insertDB
 						resultStr = insertDB(returnJson, localApi, localParamArray, urlParams, retParamRel, Constants.CODE_ERR_SUCCESS);
-						// 更新访问次数
-						remoteApiDao.updateCnt(id, --count);
+						resultContent.setRetData(resultStr);
+						resultStr = resultContent.toString();
 					} else {
 						// 插入条件不为空,则判断是否符合插入条件
 						String key = insertCondition.keySet().iterator().next();
@@ -386,8 +349,8 @@ public class QueryApiMultiple implements QueryApi {
 						if (!StringUtil.isNull(returnValue) && returnValue.equals(value)) {
 							// insertDB
 							resultStr = insertDB(returnJson, localApi, localParamArray, urlParams, retParamRel, Constants.CODE_ERR_SUCCESS);
-							// 更新访问次数
-							remoteApiDao.updateCnt(id, --count);
+							resultContent.setRetData(resultStr);
+							resultStr = resultContent.toString();
 						} else {
 							// 返回成功
 							Map<String, Object> code = codeDao.queryByCode(Constants.CODE_ERR_SUCCESS);
@@ -399,7 +362,6 @@ public class QueryApiMultiple implements QueryApi {
 					}
 					break;
 				} else {
-					returnMap.put("countCode", Constants.CODE_ERR_FAIL);
 					// error
 					// 判断返回类型
 					if (Constants.RET_CODE_TYPE_CONTINUE.equals(codeType)) {
@@ -426,8 +388,7 @@ public class QueryApiMultiple implements QueryApi {
 			}
 			
 		} // loop remoteApiList end
-		returnMap.put("resultStr", resultStr);
-		return returnMap;
+		return resultStr;
 	}
 	
 	@SuppressWarnings("rawtypes")
