@@ -9,6 +9,7 @@ import org.pbccrc.api.bean.ResultContent;
 import org.pbccrc.api.biz.QueryApiBiz;
 import org.pbccrc.api.biz.query.QueryApi;
 import org.pbccrc.api.dao.DBOperator;
+import org.pbccrc.api.dao.LocalApiDao;
 import org.pbccrc.api.util.Constants;
 import org.pbccrc.api.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +26,12 @@ public class QueryApiBizImpl implements QueryApiBiz{
 	@Autowired
 	private DBOperator dbOperator;
 	
+	@Autowired
+	private LocalApiDao localApiDao;
+	
 	@Override
 	@SuppressWarnings("rawtypes")
-	public String query(String service, Map<String, Object> localApi, Map urlParams) throws Exception {
+	public String query(String service, Map urlParams) throws Exception {
 		
 		// 返回信息对象
 		ResultContent resultContent = new ResultContent();
@@ -43,6 +47,8 @@ public class QueryApiBizImpl implements QueryApiBiz{
 		// 访问服务
 		String target = serviceArray[1];
 		
+		// 获取本地api
+		Map<String, Object> localApi = localApiDao.queryByService(isSingle + Constants.CONNECTOR_LINE + target);
 		
 		// 本地api参数
 		String localParams = String.valueOf(localApi.get("params"));

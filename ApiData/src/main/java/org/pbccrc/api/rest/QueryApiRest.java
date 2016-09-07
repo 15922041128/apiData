@@ -81,7 +81,7 @@ public class QueryApiRest {
 			return Response.ok(result).build();
 		}
 		
-		result = queryApiBiz.query(service, localApi, urlParams);
+		result = queryApiBiz.query(service, urlParams);
 		JSONObject resultJson = JSONObject.parseObject(result);
 		
 		// 计费

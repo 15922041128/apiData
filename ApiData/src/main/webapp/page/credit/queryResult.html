@@ -57,8 +57,8 @@ $(document).ready(function() {
 		        	var pp_idCardNo = '';
 		        	var pbi_tel = '';
 		        	var pbi_address = '';
-		        	$("#pp_idCardNo").html(pp_idCardNo);
-		        	$("#pp_name").html(pp_name);
+		        	$("#pp_idCardNo").html(idCardNo);
+		        	$("#pp_name").html(name);
 		        	$("#pbi_tel").html(pbi_tel);
 		        	$("#pbi_address").html(pbi_address);
 	        	} else {
@@ -76,7 +76,9 @@ $(document).ready(function() {
 		        	$("#pbi_photo").attr('src', '/' + pbi_photo); 
 	        	}
 	        	
-	        	
+	        	// 信用评分
+	        	var score = datas.score;
+	        	$("#score").html(score);
 	        	
 	        	// 信贷信息
 	        	var reditList = datas.reditList;
@@ -176,7 +178,7 @@ $(document).ready(function() {
 				身份证号：<label id="pp_idCardNo"></label>
 			</td>
 			<td>
-				信用平分：<label id=""></label>
+				信用平分：<label id="score"></label>
 			</td>
 			<td rowspan="2" style="width:100px">
 				<img src="" height="100" width="80" id="pbi_photo" />
@@ -186,7 +188,7 @@ $(document).ready(function() {
 			<td>
 				手机号：<label id="pbi_tel"></label>
 			</td>
-			<td colspan="2">
+			<td colspan="2" align="left">
 				地址：<label id="pbi_address"></label>
 			</td>
 		</tr>

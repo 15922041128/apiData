@@ -129,4 +129,7 @@ public class Constants {
 	/** cost type */
 	public static final String COST_TYPE_COUNT = "count";
 	public static final String COST_TYPE_PRICE = "price";
+	
+	/** 本地访问用service */
+	public static final String SERVICE_S_QUERYSCORE = "s-queryScore";
 }

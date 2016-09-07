@@ -11,12 +11,13 @@ import java.util.Map;
 import org.pbccrc.api.bean.DBEntity;
 import org.pbccrc.api.bean.User;
 import org.pbccrc.api.biz.PersonBiz;
+import org.pbccrc.api.biz.QueryApiBiz;
 import org.pbccrc.api.dao.DBOperator;
 import org.pbccrc.api.dao.PBaseInfoDao;
 import org.pbccrc.api.dao.PPersonDao;
 import org.pbccrc.api.dao.PReditDao;
 import org.pbccrc.api.util.Constants;
-import org.pbccrc.api.util.RemoteApiOperator;
+import org.pbccrc.api.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +38,9 @@ public class PersonBizImpl implements PersonBiz {
 	
 	@Autowired
 	private DBOperator dbOperator;
+	
+	@Autowired
+	private QueryApiBiz queryApiBiz;
 	
 	/**
 	 * @param name          姓名
@@ -153,6 +157,19 @@ public class PersonBizImpl implements PersonBiz {
 		String personID = String.valueOf(resPerson.get(Constants.PERSON_ID));
 		returnObj.put("person", person);
 		
+		// 获取用户信用评分信息
+		String score = "暂无分数"; 
+		String service = Constants.SERVICE_S_QUERYSCORE;
+		Map<String, String[]> params = new HashMap<String, String[]>();
+		params.put("identityCard", new String[]{String.valueOf(resPerson.get("idCardNo"))});
+		String result = queryApiBiz.query(service, params);
+		JSONObject resultObj = JSONObject.parseObject(result);
+		String resultScore = resultObj.getString("score");
+		if (!StringUtil.isNull(resultScore)) {
+			score = resultScore;
+		}
+		returnObj.put("score", score);
+		
 		// 获取用户基本信息
 		List<Map<String, Object>> pBaseInfoList = pBaseInfoDao.queryByPersonID(personID);
 		if (null == pBaseInfoList || pBaseInfoList.size() == 0) {
@@ -160,11 +177,6 @@ public class PersonBizImpl implements PersonBiz {
 		} else {
 			returnObj.put("pBaseInfo", pBaseInfoList.get(0));
 		}
-		
-		// 获取用户信用评分信息
-		String score = "0"; 
-		String url = "http://www.qilingyz.com/api.php?m=open.queryScore&identityCard=" + idCardNo;
-		returnObj.put("score", score);
 		
 		// 获取用户信贷信息
 		List<Map<String, Object>> reditList = pReditDao.queryAll(personID);
