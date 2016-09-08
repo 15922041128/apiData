@@ -104,13 +104,16 @@ function getFileName(obj) {
 	<form id="personForm"  name="ajform" enctype="multipart/form-data" method="post">
 	<ul class="padding_left_40">
 		<li style="padding-left:200px; padding-top: 30px; padding-bottom: 20px;" " >
-			<font class="regist_text span-14"><h2 style="color: #6b6b6b"> 填写基本信息</h2></font><br/>
+			<font class="regist_text span-14"><h2 style="color: #6b6b6b"> 填写基本信息</h2></font>
+			<br/>
 		</li>
 		<li class=" margin_top_20 height32">
 			<font class="regist_text span-14"><label class="span-red">
 					*
 			</label> 姓名：</font>
 			<input maxlength="30" id="name" type="text" class="login_input">
+			<div id="divPreview1"><img id="imgHeadPhoto1" height="100" width="80" alt="照片预览" style="margin-left: 20px;"/></div>
+   			<div id="divNewPreview1" style="filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=image); border: solid 0px #d2e2e2; display: none;"></div>
 		</li>
 		<li class=" margin_top_20 height32">
 			<font class="regist_text span-14"><label class="span-red">
@@ -122,30 +125,47 @@ function getFileName(obj) {
 			<font class="regist_text span-14"><label class="span-red">
 			</label> 照片：</font>
 			<input maxlength="30" name="photo" fileindex="1" type="file" onchange="imageChange(this)" >
+			<!--  
 			<div id="divPreview1" ><img id="imgHeadPhoto1"  height="100" width="80" alt="照片预览"/></div>
    			<div id="divNewPreview1"  style="filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=image); border: solid 0px #d2e2e2; display: none;"></div>
+   			-->
 		</li>
-		<li class=" margin_top_100 height32">
+		<li class=" margin_top_20 height32">
 			<font class="regist_text span-14"><label class="span-red">
 					*
 			</label> 手机号：</font>
 			<input maxlength="30" id="tel" type="text" class="login_input">
 		</li>
+		
 		<li class=" margin_top_20 height32">
 			<font class="regist_text span-14"><label class="span-red">
 					*
-			</label> 地址：</font>
+			</label> 省：</font>
 			
-			<select id="cmbProvince" class="open_select"></select>  
-            <select id="cmbCity" class="open_select"></select>  
-            <select id="cmbArea" class="open_select"></select>  
+			<select id="cmbProvince" class="open_select_box"></select>  
+		</li>
+		<li class=" margin_top_20 height32">
+			<font class="regist_text span-14"><label class="span-red">
+					*
+			</label> 市：</font>
+			
+            <select id="cmbCity" class="open_select_box"></select>  
+		</li>
+		<li class=" margin_top_20 height32">
+			<font class="regist_text span-14"><label class="span-red">
+					*
+			</label> 区：</font>
+            <select id="cmbArea" class="open_select_box"></select>  
             <script type="text/javascript">  
                   addressInit('cmbProvince', 'cmbCity', 'cmbArea');  
             </script>  
 		</li>
+		
+		
 		<li class=" margin_top_20 height32">
 			<font class="regist_text span-14"><label class="span-red">
-			</label></font>
+					*
+			</label> 详细地址：</font>
 			<input maxlength="60" id="address" type="text" class="login_input">
 		</li>
 		

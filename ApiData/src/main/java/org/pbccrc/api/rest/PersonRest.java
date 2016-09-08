@@ -1,6 +1,7 @@
 package org.pbccrc.api.rest;
 
 import java.io.File;
+import java.net.URI;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
@@ -96,14 +97,14 @@ public class PersonRest {
 		return Response.ok(retData).build();
 	}
 	
-	@GET
+	@POST
 	@Path("/query")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response query(@QueryParam("name") String name, @QueryParam("idCardNo") String idCardNo) throws Exception{
 		
 		JSONObject obj = personBiz.getReditList(name, idCardNo);
 		
-		return Response.ok(obj).build();
+		return Response.ok(obj).location(new URI("page/credit/queryResult.html")).build();
 	}
 
 }

@@ -112,6 +112,7 @@ position:absolute; right:0px; z-index:1001;}
 .text1 { width:200px; }
 .text3 { width:100px; }
 .inputBtn { height:36px; line-height:28px; padding:3px 8px; display:inline-block; text-align:center; font-size:14px; font-weight:bold; color:#fff; border:none; background-color:#c11000; border-radius:5px; -moz-border-radius:5px; -webkit-border-radius:5px; cursor:pointer; }
+.disableBtn { height:36px; line-height:28px; padding:3px 8px; display:inline-block; text-align:center; font-size:14px; font-weight:bold; color:#fff; border:none; background-color:#c0c0c0; border-radius:5px; -moz-border-radius:5px; -webkit-border-radius:5px; cursor:pointer; }
 .inputBtn:hover { background-color:#B20F03; }
 .btn1 { width:318px;}
 .btn2 { width:218px;}

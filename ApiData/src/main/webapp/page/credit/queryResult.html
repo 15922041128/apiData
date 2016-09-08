@@ -32,19 +32,20 @@ $(document).ready(function() {
 	
 	var name = getUrlValue('name');
 	var idCardNo = getUrlValue('idCardNo');
-    
+	
 	var params = {"name" : name, "idCardNo" : idCardNo};
 	 
 	 $.ajax({
 	        async:false,
-	        type: "GET",  
-	        url: getLocation() + "/r/person/query", 
-	        data: params,
+	        type: "POST",  
+	        url: getLocation() + "/r/person/query?name="+name+"&idCardNo="+idCardNo, 
+	        // data: params,
 	        success: function(datas){
 	        	
 	        	var status = datas.status;
 	        	
 	        	if ('error' == status) {
+	        		insertNullTable();
 	        		swal('查询失败');
 	        		return false;
 	        	}
@@ -103,32 +104,7 @@ $(document).ready(function() {
 	        	var dishonestList = datas.dishonestList;
 	        	var dishonestTable = $("#dishonestTable");
 	        	if (0 == dishonestList.length) {
-	        		var tr1 = "<tr class='odd-row'>";
-	        		tr1 = tr1 + "<th class='first'>" + "<b>被执行人姓名</b>：" + '' + "</th>";
-	        		tr1 = tr1 + "<th style='text-align:left;line-height:20px'>" + "被执行人身份证号码：" + '' + "</th>";
-	        		tr1 = tr1 + "<th style='text-align:left'>" + "省份：" + '' + "</th>";
-	        		tr1 = tr1 + "<th>" + "发布时间：" + ''  + "</th>";
-	        		tr1 = tr1 + "</tr>"
-	        		dishonestTable.append(tr1);
-	        		
-	        		var tr2 = "<tr>";
-	        		tr2 = tr2 + "<td style='text-align:left;line-height:20px'>" + "<b>执行依据号：</b>" + '' + "</td>";
-	        		tr2 = tr2 + "<td style='text-align:left'>" + "<b>被执行人的履行情况：</b>" + '' + "</td>";
-	        		tr2 = tr2 + "<td colspan='2' style='text-align:left'>" + "<b>执行法院：</b>" + '' + "</td>";
-	        		tr2 = tr2 + "</tr>";
-	        		dishonestTable.append(tr2);
-	        		
-	        		var tr3 = "<tr>";
-	        		tr3 = tr3 + "<td colspan='4' style='text-align:left;line-height:20px'>" + "<b>生效法律文书确定的义务：</b>" + '' + "</td>";
-	        		tr3 = tr3 + "</tr>";
-	        		dishonestTable.append(tr3);
-	        		
-	        		var tr4 = "<tr>";
-	        		tr4 = tr4 + "<td colspan='4' style='text-align:left;line-height:20px'>" + "<b>失信被执行人行为具体情形：</b>" + '' + "</td>";
-	        		tr4 = tr4 + "</tr>";
-	        		dishonestTable.append(tr4);
-	        		
-	        		dishonestTable.append("<tr><td colspan='4'></td></tr>");
+	        		insertNullTable();
 	        	} else {
 	        		$.each(dishonestList, function (i, data) {
 		        		var tr1 = "<tr class='odd-row'>";
@@ -163,6 +139,35 @@ $(document).ready(function() {
 	    });
 });
 
+function insertNullTable(){
+	var dishonestTable = $("#dishonestTable");
+	var tr1 = "<tr class='odd-row'>";
+	tr1 = tr1 + "<th class='first'>" + "<b>被执行人姓名</b>：" + '' + "</th>";
+	tr1 = tr1 + "<th style='text-align:left;line-height:20px'>" + "被执行人身份证号码：" + '' + "</th>";
+	tr1 = tr1 + "<th style='text-align:left'>" + "省份：" + '' + "</th>";
+	tr1 = tr1 + "<th>" + "发布时间：" + ''  + "</th>";
+	tr1 = tr1 + "</tr>"
+	dishonestTable.append(tr1);
+	
+	var tr2 = "<tr>";
+	tr2 = tr2 + "<td style='text-align:left;line-height:20px'>" + "<b>执行依据号：</b>" + '' + "</td>";
+	tr2 = tr2 + "<td style='text-align:left'>" + "<b>被执行人的履行情况：</b>" + '' + "</td>";
+	tr2 = tr2 + "<td colspan='2' style='text-align:left'>" + "<b>执行法院：</b>" + '' + "</td>";
+	tr2 = tr2 + "</tr>";
+	dishonestTable.append(tr2);
+	
+	var tr3 = "<tr>";
+	tr3 = tr3 + "<td colspan='4' style='text-align:left;line-height:20px'>" + "<b>生效法律文书确定的义务：</b>" + '' + "</td>";
+	tr3 = tr3 + "</tr>";
+	dishonestTable.append(tr3);
+	
+	var tr4 = "<tr>";
+	tr4 = tr4 + "<td colspan='4' style='text-align:left;line-height:20px'>" + "<b>失信被执行人行为具体情形：</b>" + '' + "</td>";
+	tr4 = tr4 + "</tr>";
+	dishonestTable.append(tr4);
+	
+	dishonestTable.append("<tr><td colspan='4'></td></tr>");
+}
 </script>
 </head>
 <body>
@@ -174,11 +179,11 @@ $(document).ready(function() {
 			<td>
 				姓名：<label id="pp_name"></label>
 			</td>
-			<td>
+			<td style="text-align:left">
 				身份证号：<label id="pp_idCardNo"></label>
 			</td>
 			<td>
-				信用平分：<label id="score"></label>
+				信用评分：<label id="score"></label>
 			</td>
 			<td rowspan="2" style="width:100px">
 				<img src="" height="100" width="80" id="pbi_photo" />
@@ -188,7 +193,7 @@ $(document).ready(function() {
 			<td>
 				手机号：<label id="pbi_tel"></label>
 			</td>
-			<td colspan="2" align="left">
+			<td colspan="2" style="text-align:left">
 				地址：<label id="pbi_address"></label>
 			</td>
 		</tr>

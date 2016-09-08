@@ -17,3 +17,24 @@ function getUrlValue(name){
      } 
      return "-1";
 }
+
+//以post方式打开新窗口
+function openNewPageWithPostData(url, name, paramNames, paramValues) { 
+	var newWindow = window.open(url, name);  
+    if (!newWindow)  {
+    	return false;  	
+    }
+    
+    var html = "";  
+    html += "<html><head></head><body><form id='formid' method='post' action='" + url + "'>";  
+    
+    for(var i=0 ; i<paramNames.length ; i++) { 
+    	html += "<input type='hidden' name='" + paramNames[i] + "' value='" + paramValues[i] + "'/>";
+    } 
+      
+    html += "</form><script type='text/javascript'>document.getElementById('formid').submit();";  
+    html += "<\/script></body></html>".toString().replace(/^.+?\*|\\(?=\/)|\*.+?$/gi, "");   
+    newWindow.document.write(html);  
+      
+    return newWindow;  
+} 

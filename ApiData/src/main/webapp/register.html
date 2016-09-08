@@ -13,6 +13,7 @@
 <script type="text/javascript" src="js/input_notice.js"></script>
 <script type="text/javascript" src="js/vcode.js"></script>
 <script type="text/javascript" src="js/libs/sweetalert/sweetalert.min.js"></script>
+<script type="text/javascript" src="js/validator.js"></script>
 <script>
 	onload = function () {
 		document.getElementById("btn").addEventListener("click", function () {
@@ -60,9 +61,17 @@
 				return false;
 			}
 			
+			/*
 			var silderValue = $('#silderValue').val();
 			if (silderValue == 'n') {
 				swal("请拖动滑块进行验证");
+				return false;
+			}
+			*/
+			var vCode = $('#vCode').val();
+			var hiddenVCode = $('#hiddenVCode').val();
+			if (vCode != hiddenVCode) {
+				swal("验证码错误,请重新获取");
 				return false;
 			}
 			
@@ -104,9 +113,11 @@
                	if ("Y"==msg) {
                		$("#errMsg").css('display','inline');
                		$('#btn').attr("disabled", true);
+               		$('#btn').attr("class", "disableBtn btn2");
                	} else {
                		$("#errMsg").css('display','none');
-               		$('#btn').attr("disabled", false); 
+               		$('#btn').attr("disabled", false);
+               		$('#btn').attr("class", "inputBtn btn2");
                	}
                }  
            });
@@ -119,6 +130,35 @@ function displayYesCurrent(obj){
 		input.parentNode.getElementsByTagName("span")[0].style.display = "inline";
 		input.parentNode.getElementsByTagName("span")[1].style.display = "none";
 	 }
+}
+</script>
+<script>
+function sendVCode(obj) {
+	
+	var contactTel = $('#contactTel').val();
+	if (contactTel=='') {
+		swal("联系人电话不能为空");
+		return false;
+	}
+	var res = vaildPhoneNo(contactTel);
+	if (!res) {
+		swal("联系人电话格式错误");
+		return false;	
+	}
+	
+	var params = {"phoneNo" : contactTel};
+	
+	$.ajax({
+        async:false,
+        type: "GET",  
+        url: "r/SMS/getVCode",
+        data: params,
+        success: function(vCode){
+        	$('#hiddenVCode').val(vCode);
+        }  
+    });
+	
+	settime(obj);
 }
 </script>
 </head>
@@ -191,6 +231,7 @@ function displayYesCurrent(obj){
 							<span></span>
 						</li>
 						
+						<!--  
 						<li class="margin_top_20 height32">
 							<font class="regist_text span-14"><label class="span-red">
 									*
@@ -210,6 +251,41 @@ function displayYesCurrent(obj){
 								    })
 								</script> 
 							</div>
+						</li>
+						-->
+						
+						<li class="margin_top_20 height32">
+							<font class="regist_text span-14"><label class="span-red">
+									*
+							</label> 验证码 ：</font>
+							<input maxlength="18" id="vCode" type="text" class="vCode_text">
+							<!--  
+							<input type="button" class="inputBtn btn4" id="vCodeBtn" value="获取验证码" onclick="settime(this);sendVCode();">
+							-->
+							<input type="button" class="inputBtn btn4" id="vCodeBtn" value="获取验证码" onclick="sendVCode(this);">
+							<script type="text/javascript"> 
+								var countdown = 20; 
+								function settime(val) { 
+									if (countdown == 0) { 
+										val.removeAttribute("disabled"); 
+										$('#vCodeBtn').attr("class", "inputBtn btn4");
+										val.value="获取验证码"; 
+										countdown = 20; 
+									} else { 
+										val.setAttribute("disabled", true); 
+										$('#vCodeBtn').attr("class", "disableBtn btn4");
+										val.value="重新发送(" + countdown + ")"; 
+										countdown--; 
+									} 
+									setTimeout(function() {
+										if (countdown == 20) {
+											return false;
+										}
+										settime(val) 
+									},1000) 
+								} 
+							</script> 
+							<input id="hiddenVCode" type="hidden">
 						</li>
 						
 						<li class="padding_top_30">

@@ -12,11 +12,21 @@
 function doQuery(){
 	var name = $("#name").val();
 	var idCardNo = $("#idCardNo").val();
+	/*
+	var paramNames = new Array();
+	paramNames[0] = "name";
+	paramNames[1] = "idCardNo";
+	var paramValues = new Array();
+	paramValues[0] = name;
+	paramValues[1] = idCardNo;
+	openNewPageWithPostData("queryResult.html", "", paramNames, paramValues);
+	*/
 	window.open("queryResult.html?name=" + name + "&idCardNo=" + idCardNo);
 }
 </script>
 </head>
 <body marginwidth="1" marginheight="1">
+<form id="postForm"></form>
 <div class="con_right">
 	<ul class="padding_left_40">
 		<li style="padding-left:180px; padding-top: 30px; padding-bottom: 20px;" >

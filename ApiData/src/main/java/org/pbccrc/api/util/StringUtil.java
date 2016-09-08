@@ -3,6 +3,7 @@ package org.pbccrc.api.util;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -74,8 +75,20 @@ public class StringUtil {
             hexValue.append(Integer.toHexString(val));  
         }  
         return hexValue.toString();  
-  
-    }  
+    }
+    
+    /***
+     * 生成4位验证码
+     * @return
+     */
+    public static String createVCode4() {
+    	int min = 1000;
+    	int max = 9999;
+    	Random rand = new Random();
+	    int tmp = Math.abs(rand.nextInt());
+	    int vCode = tmp % (max - min + 1) + min;
+	    return String.valueOf(vCode);
+    }
       
     public static void main(String[] args) {  
         System.out.println( decodeUnicode("\u8eab\u4efd\u8bc1\u53f7\u7801\u4e0d\u5408\u6cd5\uff01"));  
