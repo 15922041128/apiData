@@ -135,7 +135,7 @@ width:990px; margin:0 auto; min-width:980px; height:80px; line-height:30px;}
 .con_50{ clear:both; width:580px; height:50px; margin:0 auto;}
 .con_300{ clear:both; width:580px; height:300px; margin:0 auto;}
 
-.vCode_text{ width:90px; line-height:32px; color:#444; padding:3px 8px;}
+.vCode_text{ width:90px; height:30px; line-height:30px; border:1px solid #D1D1D1; color:#686868; float:left; text-indent:8px; display:inline;}
 .regist_text{ width:150px; height:32px; text-align:right; float:left; line-height:32px; color:#444;}
 .login_input{ width:220px; height:30px; line-height:30px; border:1px solid #D1D1D1; color:#686868; float:left; text-indent:8px; display:inline;}
 .password{ width:28px; height:21px; float:left; margin-left:-35px; display:inline; margin-top:5px;}
