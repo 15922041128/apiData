@@ -12,10 +12,12 @@
 			sumCreditLimit,
 			maxCreditLimit,
 			orgNumber,
-			areaNumber,
+			maxDebt,
+			foreignMaxDebt,
 			sumTermsPastDue,
 			maxTermsPastDue,
-			minCardDate 
+			minCardDate,
+			closeCards
 		from zh_creditcard where insideCode = #{insideCode}
 	</select>
 	

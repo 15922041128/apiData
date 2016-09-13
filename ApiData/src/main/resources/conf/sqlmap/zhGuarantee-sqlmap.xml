@@ -11,7 +11,8 @@
 			ddgs.statName as guaranteeStat,
 			ddgw.guaranteeWayName as guaranteeWay,
 			ddf.corporateName as finance,
-			occurpyTime
+			g.occurpyTime,
+			g.forInnerID
 		from zh_guarantee g
 		LEFT JOIN zh_dd_guaranteestat ddgs on g.guaranteeStat = ddgs.statCode
 		LEFT JOIN zh_dd_guaranteeway ddgw on g.guaranteeWay = ddgw.guaranteeWayCode
