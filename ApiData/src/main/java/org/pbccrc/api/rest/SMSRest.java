@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 public class SMSRest {
 	
 	@Autowired
-	@Qualifier("ms_smsBiz")
+	@Qualifier("dxw_smsBiz")
 	private SMSBiz smsBiz;
 	
 	@GET

@@ -56,6 +56,7 @@ public class Constants {
 	public static final String PARAM_TYPE_CONSTANT = "constant";
 	public static final String PARAM_TYPE_SERVICE = "service";
 	public static final String PARAM_TYPE_APIKEY = "apiKey";
+	public static final String PARAM_TYPE_FORMAT = "format";
 	
 	// 是否必须
 	public static final String PARAM_REQUIRED_Y = "yes";
@@ -131,5 +132,18 @@ public class Constants {
 	public static final String COST_TYPE_PRICE = "price";
 	
 	/** 本地访问用service */
+	// 个人信用分
 	public static final String SERVICE_S_QUERYSCORE = "s-queryScore";
+	// 公积金 
+	public static final String SERVICE_S_QGJJD = "s-qgjjd";
+	// 涉诉信息(从执行公告中查询某人)
+	public static final String SERVICE_S_UCACCIND_ZXGG = "s-ucaccindZXGG";
+	// 涉诉信息(从失信公告中查询某人)
+	public static final String SERVICE_S_UCACCIND_SXGG = "s-ucaccindSXGG";
+	// 涉诉信息(从裁判文书中查询某人)
+	public static final String SERVICE_S_UCACCIND_CPWS = "s-ucaccindCPWS";
+	
+	/** 本地访问用url */
+	// 失信人被执行信息
+	public static final String URL_LDB_GETSXR = "http://127.0.0.1:8080/ApiData/r/ldb/getSxr";
 }

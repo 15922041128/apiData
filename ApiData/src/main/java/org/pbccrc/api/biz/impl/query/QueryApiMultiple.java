@@ -191,13 +191,62 @@ public class QueryApiMultiple implements QueryApi {
 						return resultContent.toString();
 					}
 					// 设置远程访问参数
-					paramMap.put(paramName, ((String[])urlParams.get(paramName))[0]);
+					// 判断参数类型
+					if (Constants.PARAM_TYPE_FORMAT.equals(paramType)) {
+						// format类型
+						// 参数数组
+						String[] formatParams = String.valueOf(remoteParam.get("formatParam")).split(Constants.COMMA);
+						// 参数与值连接符号
+						String formatEqual = String.valueOf(remoteParam.get("formatEqual"));
+						// 参数间连接符号
+						String formatConnect = String.valueOf(remoteParam.get("formatConnect"));
+						// 组合后参数值
+						StringBuffer paramBuffer = new StringBuffer();
+						// 遍历参数数组拼接组合后参数值
+						for (String formatParam : formatParams) {
+							paramBuffer.append(formatParam);
+							paramBuffer.append(formatEqual);
+							paramBuffer.append(((String[])urlParams.get(formatParam))[0]);
+							paramBuffer.append(formatConnect);
+						}
+						String paramValue = paramBuffer.toString();
+						paramValue = paramValue.substring(0, paramValue.length() - 1);
+						paramMap.put(paramName, paramValue);
+					} else {
+						// 默认类型
+						paramMap.put(paramName, ((String[])urlParams.get(paramName))[0]);
+					}
 				} else {
 					// 设置远程访问参数
 					if (null != urlParams.get(paramName)&& 
 							!Constants.PARAM_TYPE_SERVICE.equals(paramType) &&
 							!Constants.PARAM_TYPE_APIKEY.equals(paramType)) {
-						paramMap.put(paramName, ((String[])urlParams.get(paramName))[0]);
+						
+						// 判断参数类型
+						if (Constants.PARAM_TYPE_FORMAT.equals(paramType)) {
+							// format类型
+							// 参数数组
+							String[] formatParams = String.valueOf(remoteParam.get("formatParam")).split(Constants.COMMA);
+							// 参数与值连接符号
+							String formatEqual = String.valueOf(remoteParam.get("formatEqual"));
+							// 参数间连接符号
+							String formatConnect = String.valueOf(remoteParam.get("formatConnect"));
+							// 组合后参数值
+							StringBuffer paramBuffer = new StringBuffer();
+							// 遍历参数数组拼接组合后参数值
+							for (String formatParam : formatParams) {
+								paramBuffer.append(formatParam);
+								paramBuffer.append(formatEqual);
+								paramBuffer.append(((String[])urlParams.get(formatParam))[0]);
+								paramBuffer.append(formatConnect);
+							}
+							String paramValue = paramBuffer.toString();
+							paramValue = paramValue.substring(0, paramValue.length() - 1);
+							paramMap.put(paramName, paramValue);
+						} else {
+							// 默认类型
+							paramMap.put(paramName, ((String[])urlParams.get(paramName))[0]);
+						}
 					}
 				}
 				

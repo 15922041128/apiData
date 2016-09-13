@@ -32,5 +32,16 @@ public class LocalDBRest {
 		
 		return Response.ok(result).build();
 	}
+	
+	@GET
+	@Path("/getSxr")
+	public Response getSxr(@QueryParam("idCardNo") String idCardNo) throws Exception {
+		
+		String result = Constants.BLANK;
+		
+		result = localDBBiz.getSxr(idCardNo);
+		
+		return Response.ok(result).build();
+	}
 
 }

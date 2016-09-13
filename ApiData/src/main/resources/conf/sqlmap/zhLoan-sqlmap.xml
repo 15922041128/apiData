@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="dao.zhLoanDao">
+	
+	<select id="query" parameterType="java.lang.String" resultType="java.util.HashMap">
+			select
+			l.ID,
+			l.insideCode,
+			ddt.type_Name as loanType,
+			dda.provinceName as provinceName,
+			dda.cityName as cityName,
+			dda.countryName as countryName,
+			ddf.corporateName as finance,
+			l.loanAmount,
+			l.dateOpened,
+			l.dateClosed,
+			ddal.accountStatName as accountStat
+		from zh_loan l 
+		LEFT JOIN zh_dd_type ddt on l.loanType = ddt.type_Code
+		LEFT JOIN zh_dd_area dda on l.areaCode = dda.areaCode
+		LEFT JOIN zh_dd_financeorg ddf on l.financeCode = ddf.financeCode
+		LEFT JOIN zh_dd_loan_accountstat ddal on l.accountStatCode = ddal.accountStatCode
+		where l.insideCode = #{insideCode}
+	</select>
+	
+</mapper>

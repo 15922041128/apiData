@@ -6,8 +6,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.pbccrc.api.bean.DBEntity;
+import org.pbccrc.api.bean.ResultContent;
 import org.pbccrc.api.biz.LocalDBBiz;
 import org.pbccrc.api.dao.DBOperator;
+import org.pbccrc.api.util.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,6 +41,12 @@ public class LocalDBBizImpl implements LocalDBBiz {
 		entity.setFields(fields);
 		entity.setValues(values);
 		Map<String, Object> user = dbOperator.queryData(entity);
+		if (null == user) {
+			ResultContent resultContent = new ResultContent();
+			resultContent.setErrNum(Constants.CODE_ERR_FAIL);
+			resultContent.setRetMsg(Constants.CODE_ERR_FAIL_MSG);
+			return resultContent.toString();
+		}
 		String userID = String.valueOf(user.get("id"));
 		
 		fields = new ArrayList<String>();
@@ -68,4 +76,25 @@ public class LocalDBBizImpl implements LocalDBBiz {
 	}
 	
 
+	/***
+	 * 根据身份证和姓名查询失信被执行人信息
+	 * @param idCardNo		身份证号
+	 * @return
+	 * @throws Exception
+	 */
+	public String getSxr(String idCardNo) throws Exception {
+		
+		String tableName = "ldb_dishonest_info";
+		DBEntity entity = new DBEntity();
+		entity.setTableName(tableName);
+		List<String> fields = new ArrayList<String>();
+		fields.add("CARDNUM");
+		List<String> values = new ArrayList<String>();
+		values.add(idCardNo);
+		entity.setFields(fields);
+		entity.setValues(values);
+		List<Map<String, Object>> dishonestList = dbOperator.queryDatas(entity);
+		
+		return JSON.toJSONString(dishonestList);
+	}
 }
