@@ -39,6 +39,11 @@ function toSubmit(){
 		return false;
 	}
 	
+	if (contactDate > loanDate) {
+		swal("合同日期应小于等于放款日期!");
+		return false;
+	}
+	
 	if (hireDate == '') {
 		swal("请填写起租日!");
 		return false;
@@ -46,6 +51,11 @@ function toSubmit(){
 	
 	if (expireDate == '') {
 		swal("请填写到期日!");
+		return false;
+	}
+	
+	if (hireDate > expireDate) {
+		swal("起租日应小于等于到期日!");
 		return false;
 	}
 	
@@ -74,6 +84,11 @@ function toSubmit(){
 			swal("余额请输入数字!");
 			return false;
 	    }
+	}
+	
+	if (balance > totalAmount) {
+		swal("余额应小于等于总金额!");
+		return false;
 	}
 	
 	var params = {"contactDate" : contactDate, "loanDate" : loanDate, "hireDate" : hireDate, "expireDate" : expireDate, 

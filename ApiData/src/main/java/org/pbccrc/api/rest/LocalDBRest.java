@@ -17,6 +17,14 @@ public class LocalDBRest {
 	@Autowired
 	private LocalDBBiz localDBBiz;
 
+	/**
+	 * 根据身份证和姓名查询信贷信息
+	 * @param name
+	 * @param idCardNo
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
 	@GET
 	@Path("/get")
 	public Response query(@QueryParam("name") String name, @QueryParam("idCardNo") String idCardNo, 
@@ -33,6 +41,12 @@ public class LocalDBRest {
 		return Response.ok(result).build();
 	}
 	
+	/**
+	 * 失信人查询
+	 * @param idCardNo
+	 * @return
+	 * @throws Exception
+	 */
 	@GET
 	@Path("/getSxr")
 	public Response getSxr(@QueryParam("idCardNo") String idCardNo) throws Exception {
