@@ -14,9 +14,9 @@
 <script type="text/javascript">
 function toSubmit(){
 	var contactDate = $("#contactDate").val();
-	var loanDate = $("#loanDate").val();
 	var hireDate = $("#hireDate").val();
 	var expireDate = $("#expireDate").val();
+	var type = $("#type").val();
 	var loanUsed = $("#loanUsed").val();
 	var totalAmount = $("#totalAmount").val();
 	var balance = $("#balance").val();
@@ -34,18 +34,13 @@ function toSubmit(){
 		return false;
 	}
 	
-	if (loanDate == '') {
-		swal("请填写放款日期!");
-		return false;
-	}
-	
-	if (contactDate > loanDate) {
-		swal("合同日期应小于等于放款日期!");
-		return false;
-	}
-	
 	if (hireDate == '') {
 		swal("请填写起租日!");
+		return false;
+	}
+	
+	if (contactDate > hireDate) {
+		swal("合同日期应小于等于起租日!");
 		return false;
 	}
 	
@@ -75,7 +70,6 @@ function toSubmit(){
 	    }
 	}
 	
-	
 	if (balance == '') {
 		swal("请填写余额!");
 		return false;
@@ -91,7 +85,7 @@ function toSubmit(){
 		return false;
 	}
 	
-	var params = {"contactDate" : contactDate, "loanDate" : loanDate, "hireDate" : hireDate, "expireDate" : expireDate, 
+	var params = {"contactDate" : contactDate, "hireDate" : hireDate, "expireDate" : expireDate, "type" : type, 
 			"loanUsed" : loanUsed, "totalAmount" : totalAmount, "balance" : balance, "status" : status, "personID" : personID};
 	
 	$.ajax({
@@ -127,12 +121,6 @@ function toSubmit(){
 		<li class=" margin_top_20 height32">
 			<font class="regist_text span-14"><label class="span-red">
 					*
-			</label> 放款日期：</font>
-			<input maxlength="30" id="loanDate" type="text" class="login_input" onClick="WdatePicker()">
-		</li>
-		<li class=" margin_top_20 height32">
-			<font class="regist_text span-14"><label class="span-red">
-					*
 			</label> 起租日：</font>
 			<input maxlength="30" id="hireDate" type="text" class="login_input" onClick="WdatePicker()">
 		</li>
@@ -145,7 +133,16 @@ function toSubmit(){
 		<li class=" margin_top_20 height32">
 			<font class="regist_text span-14"><label class="span-red">
 					*
-			</label> 贷款用途：</font>
+			</label> 业务类型：</font>
+			<select id="type" class="open_select_box">
+				<option value="贷款">贷款</option>
+				<option value="融资">融资</option>
+			</select>
+		</li>
+		<li class=" margin_top_20 height32">
+			<font class="regist_text span-14"><label class="span-red">
+					*
+			</label> 用途：</font>
 			<input maxlength="30" id="loanUsed" type="text" class="login_input">
 		</li>
 		<li class=" margin_top_20 height32">

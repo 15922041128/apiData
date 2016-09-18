@@ -104,9 +104,9 @@ public class PersonBizImpl implements PersonBiz {
 	/**
 	 * @param personID 			personID
 	 * @param contactDate 		合同日期
-	 * @param loanDate			放款日期
 	 * @param hireDate			起租日
 	 * @param expireDate		到期日
+	 * @param type				业务类型
 	 * @param loanUsed			贷款用途
 	 * @param totalAmount		总金额
 	 * @param balance			余额
@@ -114,17 +114,17 @@ public class PersonBizImpl implements PersonBiz {
 	 * @param user				当前用户
 	 * @return
 	 */
-	public boolean addPersonRedit(String personID, String contactDate, String loanDate, String hireDate, String expireDate, 
-			String loanUsed, String totalAmount, String balance, String status, User user) {
+	public boolean addPersonRedit(String personID, String contactDate, String hireDate, String expireDate, 
+			String type, String loanUsed, String totalAmount, String balance, String status, User user) {
 		
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		
 		Map<String, Object> pRedit = new HashMap<String, Object>();
 		pRedit.put("personID", personID);
 		pRedit.put("contactDate",contactDate);
-		pRedit.put("loanDate", loanDate);
 		pRedit.put("hireDate", hireDate);
 		pRedit.put("expireDate", expireDate);
+		pRedit.put("type", type);
 		pRedit.put("loanUsed", loanUsed);
 		pRedit.put("totalAmount", totalAmount);
 		pRedit.put("balance", balance);

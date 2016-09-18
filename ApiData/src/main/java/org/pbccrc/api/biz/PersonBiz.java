@@ -22,18 +22,18 @@ public interface PersonBiz {
 	/**
 	 * @param personID 			personID
 	 * @param contactDate 		合同日期
-	 * @param loanDate			放款日期
 	 * @param hireDate			起租日
 	 * @param expireDate		到期日
-	 * @param loanUsed			贷款用途
+	 * @param type				业务类型
+	 * @param loanUsed			用途
 	 * @param totalAmount		总金额
 	 * @param balance			余额
 	 * @param status			状态
 	 * @param user				当前用户
 	 * @return
 	 */
-	public boolean addPersonRedit(String personID, String contactDate, String loanDate, String hireDate, String expireDate, 
-			String loanUsed, String totalAmount, String balance, String status, User user);
+	public boolean addPersonRedit(String personID, String contactDate, String hireDate, String expireDate, 
+			String type, String loanUsed, String totalAmount, String balance, String status, User user);
 	
 	/**
 	 * @param name 				姓名

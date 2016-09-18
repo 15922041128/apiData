@@ -76,9 +76,9 @@ public class PersonRest {
 	@Path("/add2")
 	public Response add2(@Context HttpServletRequest request,
 			@QueryParam("contactDate") String contactDate,
-			@QueryParam("loanDate") String loanDate,
 			@QueryParam("hireDate") String hireDate,
 			@QueryParam("expireDate") String expireDate,
+			@QueryParam("type") String type,
 			@QueryParam("loanUsed") String loanUsed,
 			@QueryParam("totalAmount") String totalAmount,
 			@QueryParam("balance") String balance,
@@ -89,8 +89,8 @@ public class PersonRest {
 		
 		User user = (User) request.getSession().getAttribute(Constants.CURRENT_USER);
 		
-		if(personBiz.addPersonRedit(personID, contactDate, loanDate, 
-				hireDate, expireDate, loanUsed, totalAmount, balance, status, user)){
+		if(personBiz.addPersonRedit(personID, contactDate,
+				hireDate, expireDate, type, loanUsed, totalAmount, balance, status, user)){
 			retData = Constants.RET_STAT_SUCCESS;
 		}
 		

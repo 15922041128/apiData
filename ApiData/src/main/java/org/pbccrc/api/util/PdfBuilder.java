@@ -81,7 +81,7 @@ public class PdfBuilder {
 		int width9[] = { 30, 50, 20 };
 		table9.setWidths(width9);
 		PdfPCell cell91 = new PdfPCell(new Paragraph("", pubElements.FontChinese12));
-		PdfPCell cell92 = new PdfPCell(new Paragraph("信用评分", pubElements.FontChinese12));
+		PdfPCell cell92 = new PdfPCell(new Paragraph("信用评分", pubElements.FontChinese16));
 		PdfPCell cell93 = new PdfPCell(new Paragraph(score, pubElements.FontChinese18));
 		cell92.setHorizontalAlignment(Element.ALIGN_RIGHT);
 		cell92.setVerticalAlignment(Element.ALIGN_MIDDLE);

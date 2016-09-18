@@ -33,7 +33,7 @@ public class Constants {
 	public static final String FILE_TYPE_PDF = ".pdf";
 	
 	// pdf导出目录
-	public static final String FILE_DOWNLOAD_SXR_PDF = "/files/download/sxr/pdf";//监控表格导出目录
+	public static final String FILE_DOWNLOAD_SXR_PDF = "/files/download/sxr/pdf";//pdf导出目录
 	
 	/** 返回code */
 	public static final String RET_CODE_SUCCESS = "success";

@@ -57,5 +57,16 @@ public class LocalDBRest {
 		
 		return Response.ok(result).build();
 	}
+	
+	@GET
+	@Path("/query")
+	public Response queryApi(@Context HttpServletRequest request) throws Exception {
+		
+		request.setCharacterEncoding("utf-8");
+		
+		String result = Constants.BLANK;
+		
+		return Response.ok(result).build();
+	}
 
 }
