@@ -174,8 +174,8 @@ public class PdfBuilder {
 				document.add(pubElements.PsubTitle("担保信息", pubElements.FontChinese16, imagePath2));
 				document.add(pubElements.emptyRow());
 				// 添加担保信息Grid
-				String[] guaranteeCnGrid = { "编号", "担保金额", "业务状态", "发生机构", "发生时间"};
-				String[] guaranteeDataKey = { "编号", "guaranteeSum", "guaranteeStat", "finance", "occurpyTime"};
+				String[] guaranteeCnGrid = { "编号", "担保金额", "业务状态", "担保方式", "发生机构", "发生时间"};
+				String[] guaranteeDataKey = { "编号", "guaranteeSum", "guaranteeStat", "guaranteeWay", "finance", "occurpyTime"};
 				document.add(pubElements.obj2Grid(null, true, obj.getJSONArray("guarantee"), guaranteeCnGrid, guaranteeDataKey));
 				// 加入空行
 				document.add(pubElements.emptyRow());
