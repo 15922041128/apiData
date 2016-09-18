@@ -9,6 +9,6 @@ public interface ComplexBiz {
 	 * @param identifier
 	 * @return
 	 */
-	public Map<String, Object> querySxr(String identifier) throws Exception;
+	public Map<String, Object> querySxr(String identifier, String[] queryItems) throws Exception;
 
 }

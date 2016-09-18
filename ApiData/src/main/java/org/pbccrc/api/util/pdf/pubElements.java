@@ -43,14 +43,13 @@ public class pubElements {
 	   * 生成pdf Header
 	   * @return
 	   */
-	  public static PdfPTable Pheader() {
+	  public static PdfPTable Pheader(String imagePath) {
 		  PdfPTable table = new PdfPTable(2);
 		  try {
 			  PdfPCell cell11 = new PdfPCell(new Paragraph("个人信用信息查询",FontChinese24));
 			  cell11.setVerticalAlignment(Element.ALIGN_MIDDLE);
 			  cell11.setHorizontalAlignment(Element.ALIGN_CENTER);
 			  cell11.setBorder(0);
-			  String imagePath = "D:/pdftest/yingze.jpg";
 			  Image image1 = Image.getInstance(imagePath); 
 			  
 			  //设置每列宽度比例   
@@ -72,7 +71,7 @@ public class pubElements {
 	 * @param font
 	 * @return
 	 */
-	public static PdfPTable PsubTitle(String title , Font font) {
+	public static PdfPTable PsubTitle(String title, Font font, String imagePath2) {
 		//table2 基本信息头
 		PdfPTable table = new PdfPTable(2);
 		try{
@@ -81,7 +80,6 @@ public class pubElements {
         table.setWidths(width21); 
         table.getDefaultCell().setBorder(0);
         PdfPCell cell21 = new PdfPCell(new Paragraph(title, font));
-        String imagePath2 = "D:/pdftest/boder.jpg";
         Image image21 = Image.getInstance(imagePath2); 
         cell21.setBorder(0);
         table.addCell(image21);
@@ -109,15 +107,17 @@ public class pubElements {
 	 * @param key 对应json字段名称
 	 * @return
 	 */
-	public static PdfPTable obj2Table(JSONObject jsonObj, String[] cnName, String[] key) {
-		PdfPTable table = new PdfPTable(2);
+	public static PdfPTable obj2Table(PdfPTable table, JSONObject jsonObj, String[] cnName, String[] key) {
+		if (null == table) {
+			table = new PdfPTable(2);	
+		}
 		try {
-			  //table2 基本信息头
+		  //table2 基本信息头
 	      //table3 基本信息内容
 	      int width[] = {50,50};
 	      table.setWidths(width); 
 	      for (int i = 0; i < cnName.length; i++) {
-	    	  PdfPCell cell = new PdfPCell(new Paragraph(cnName[i]+"："+key[i],FontChinese8Normal));
+	    	  PdfPCell cell = new PdfPCell(new Paragraph(cnName[i] + "：" + (jsonObj.getString(key[i]) == null ? "" : jsonObj.getString(key[i])), FontChinese8Normal));
 	    	  cell.setPaddingBottom(18);
 	    	  cell.setBorder(0);
 	    	  table.addCell(cell);
@@ -136,28 +136,40 @@ public class pubElements {
 	 * @param key
 	 * @return
 	 */
-	public static PdfPTable obj2Grid(JSONArray dataArray, String[] cnName, String[] key) {
-        PdfPTable table = new PdfPTable(8);
+	public static PdfPTable obj2Grid(PdfPTable table, boolean hasHead,JSONArray dataArray, String[] cnName, String[] key) {
+		if (null == table) {
+			table = new PdfPTable(cnName.length);
+		}
         try {
 	        BaseColor lightGrey = new BaseColor(0xCC,0xCC,0xCC);
-	        int width7[] = {5,15,15,20,12,12,12,10};
-	        table.setWidths(width7); 
+//	        int width[] = {5,15,15,20,12,12,12,10};
+	        int[] width = new int[cnName.length];
+	        for (int i = 0; i < width.length; i++){
+	        	if (i == 0) {
+	        		width[i] = 8;
+	        	} else {
+	        		width[i] = (100 - 8) / (cnName.length - 1);
+	        	}
+	        }
+	        table.setWidths(width); 
 	        //生成表头
-	        for (int i = 0; i < cnName.length; i++) {
-	        	PdfPCell cell = new PdfPCell(new Paragraph(cnName[i],FontChinese8Bold));
-	        	cell.setFixedHeight(25);
-	        	cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-	        	cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-	        	cell.setBorderColor(lightGrey);
-	        	if (i!=0)
-	        		cell.disableBorderSide(4);
-	        	if (i!=cnName.length-1)
-	        		cell.disableBorderSide(8);
-	        	table.addCell(cell);
-			}
+	        if (hasHead) {
+	        	 for (int i = 0; i < cnName.length; i++) {
+	 	        	PdfPCell cell = new PdfPCell(new Paragraph(cnName[i],FontChinese8Bold));
+	 	        	cell.setFixedHeight(25);
+	 	        	cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+	 	        	cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+	 	        	cell.setBorderColor(lightGrey);
+	 	        	if (i!=0)
+	 	        		cell.disableBorderSide(4);
+	 	        	if (i!=cnName.length-1)
+	 	        		cell.disableBorderSide(8);
+	 	        	table.addCell(cell);
+	 			}
+	        }
 	        for (int i = 0; i < dataArray.size(); i++) {
 	        	JSONObject dataObj = dataArray.getJSONObject(i);
-	        	fillGridData(dataObj, table, key, FontChinese8Normal);
+	        	fillGridData(i, dataObj, table, key, FontChinese8Normal);
 			}
         } catch (Exception e) {
         	e.printStackTrace();
@@ -172,20 +184,25 @@ public class pubElements {
 	 * @param key
 	 * @param font
 	 */
-	private static void fillGridData(JSONObject obj,PdfPTable table, String[] key, Font font) {
-		 BaseColor lightGrey = new BaseColor(0xCC,0xCC,0xCC);
-		 for (int i = 0; i < key.length; i++) {
-	        	PdfPCell cell = new PdfPCell(new Paragraph(obj.getString(key[i]),font));
-	        	cell.setFixedHeight(25);
-	        	cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-	        	cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-	        	cell.setBorderColor(lightGrey);
-	        	if (i!=0)
-	        		cell.disableBorderSide(4);
-	        	if (i!=key.length-1)
-	        		cell.disableBorderSide(8);
-	        	table.addCell(cell);
+	private static void fillGridData(int rowNumber, JSONObject obj, PdfPTable table, String[] key, Font font) {
+		BaseColor lightGrey = new BaseColor(0xCC, 0xCC, 0xCC);
+		for (int i = 0; i < key.length; i++) {
+			PdfPCell cell = null;
+			if (i == 0) {
+				cell = new PdfPCell(new Paragraph(String.valueOf(++rowNumber), font));
+			} else {
+				cell = new PdfPCell(new Paragraph(obj.getString(key[i] == null ? "" : key[i]), font));
 			}
+			cell.setFixedHeight(25);
+			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+			cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+			cell.setBorderColor(lightGrey);
+			if (i != 0)
+				cell.disableBorderSide(4);
+			if (i != key.length - 1)
+				cell.disableBorderSide(8);
+			table.addCell(cell);
+		}
 	}
         
 	

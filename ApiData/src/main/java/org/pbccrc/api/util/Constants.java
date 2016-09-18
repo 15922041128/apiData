@@ -29,6 +29,12 @@ public class Constants {
 	public static final String QUERY_API_SINGLE = "QueryApiSingle";
 	public static final String QUERY_API_MULTIPLE = "QueryApiMultiple";
 	
+	// 文件类型
+	public static final String FILE_TYPE_PDF = ".pdf";
+	
+	// pdf导出目录
+	public static final String FILE_DOWNLOAD_SXR_PDF = "/files/download/sxr/pdf";//监控表格导出目录
+	
 	/** 返回code */
 	public static final String RET_CODE_SUCCESS = "success";
 	public static final String RET_CODE_ERROR = "error";
@@ -146,4 +152,25 @@ public class Constants {
 	/** 本地访问用url */
 	// 失信人被执行信息
 	public static final String URL_LDB_GETSXR = "http://127.0.0.1:8080/ApiData/r/ldb/getSxr";
+	
+	/** 查询参数项 */
+	// 人员基本信息
+	public static final String ITEM_PERSON = "person";
+	// 居住信息
+	public static final String ITEM_ADDRESS = "address";
+	// 职业信息
+	public static final String ITEM_EMPLOYMENT = "employment";
+	// 信用卡信息
+	public static final String ITEM_CREDITCARD = "creditCard";
+	// 贷款信息
+	public static final String ITEM_LOAN = "loan";
+	// 担保信息
+	public static final String ITEM_GUARANTEE = "guarantee";
+	// 公积金信息
+	public static final String ITEM_GGJ = "ggj";
+	// 涉法涉诉信息
+	public static final String ITEM_SFSS = "sfss";
+	// 失信人被执行信息
+	public static final String ITEM_SXR = "sxr";
+	
 }
