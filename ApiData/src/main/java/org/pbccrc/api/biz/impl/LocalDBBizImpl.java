@@ -9,6 +9,8 @@ import org.pbccrc.api.bean.DBEntity;
 import org.pbccrc.api.bean.ResultContent;
 import org.pbccrc.api.biz.LocalDBBiz;
 import org.pbccrc.api.dao.DBOperator;
+import org.pbccrc.api.dao.LdbApiDao;
+import org.pbccrc.api.dao.ZhInsideCodeDao;
 import org.pbccrc.api.util.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,12 @@ public class LocalDBBizImpl implements LocalDBBiz {
 	
 	@Autowired
 	private DBOperator dbOperator;
+	
+	@Autowired
+	private LdbApiDao ldbApiDao;
+	
+	@Autowired
+	private ZhInsideCodeDao zhInsideCodeDao;
 	
 	/***
 	 * 根据身份证和姓名查询信贷信息
@@ -96,5 +104,54 @@ public class LocalDBBizImpl implements LocalDBBiz {
 		List<Map<String, Object>> dishonestList = dbOperator.queryDatas(entity);
 		
 		return JSON.toJSONString(dishonestList);
+	}
+	
+	/**
+	 * 查询本地api
+	 * @param service
+	 * @param idCardNo
+	 * @return
+	 * @throws Exception
+	 */
+	public Map<String, Object> queryApi(String service, String idCardNo) throws Exception {
+		
+		Map<String, Object> returnMap = new HashMap<String, Object>();
+		returnMap.put("isNull", "N");
+		
+		// 根据身份证号获取内码信息
+		Map<String, Object> insideCodeMap = zhInsideCodeDao.queryByCode(idCardNo);
+		if (null == insideCodeMap) {
+			returnMap.put("isNull", "Y");
+			return returnMap;
+		}
+		// 内码
+		String insideCode = String.valueOf(insideCodeMap.get("insideCode"));
+		
+		// 获取api
+		Map<String, Object> api = ldbApiDao.queryByService(service);
+		// 获取返回字段
+		String[] returnParams = String.valueOf(api.get("returnParams")).split(Constants.COMMA);
+		
+		// DB操作对象
+		DBEntity entity = new DBEntity();
+		entity.setTableName("ldb_" + service);
+		List<String> fields = new ArrayList<String>();
+		List<String> values = new ArrayList<String>();
+		fields.add("insideCode");
+		values.add(insideCode);
+		entity.setFields(fields);
+		entity.setValues(values);
+		
+		// 查询本地数据库
+		Map<String, Object> dbMap = dbOperator.queryData(entity);
+
+		// 获取返回字段
+		Map<String, Object> result = new HashMap<String, Object>();
+		for (String returnParam : returnParams) {
+			result.put(returnParam, dbMap.get(returnParam));
+		}
+		returnMap.put("result", result);
+		
+		return returnMap;
 	}
 }

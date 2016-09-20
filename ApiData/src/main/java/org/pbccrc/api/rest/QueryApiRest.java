@@ -16,6 +16,7 @@ import org.pbccrc.api.biz.CostBiz;
 import org.pbccrc.api.biz.QueryApiBiz;
 import org.pbccrc.api.dao.LocalApiDao;
 import org.pbccrc.api.util.Constants;
+import org.pbccrc.api.util.RemoteApiOperator;
 import org.pbccrc.api.util.StringUtil;
 import org.pbccrc.api.util.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,9 @@ public class QueryApiRest {
 	
 	@Autowired
 	private CostBiz costBiz;
+	
+	@Autowired
+	private RemoteApiOperator remoteApiOperator;
 	
 	@GET
 	@Path("/get")
@@ -152,7 +156,35 @@ public class QueryApiRest {
 			}
 		}
 		
-		
 		return Response.ok(result).build();
 	}
+	
+	@GET
+	@Path("/score")
+	public Response score(@Context HttpServletRequest request) throws Exception {
+		
+		ResultContent content = new ResultContent();
+		content.setErrNum(Constants.CODE_ERR_SUCCESS);
+		content.setRetMsg(Constants.CODE_ERR_SUCCESS_MSG);
+		
+		String url = Constants.REMOTE_URL_SCORE;
+		
+		String queryString = new String(request.getQueryString().getBytes("ISO-8859-1"), "utf-8");
+		
+		String appKey = "&appkey=SVXcpvaHNw";
+		
+		String result = remoteApiOperator.remoteAccept(url + Constants.URL_PARAM_CONNECTOR + queryString + appKey);
+		
+		JSONObject obj = JSONObject.parseObject(result);
+		String score = obj.getString("score");
+		if (StringUtil.isNull(score)) {
+			content.setErrNum(Constants.CODE_ERR_FAIL);
+			content.setRetMsg(Constants.CODE_ERR_FAIL_MSG);
+		} else {
+			content.setRetData(result);
+		}
+		
+		return Response.ok(content.toString()).build();
+	}
+	
 }

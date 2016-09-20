@@ -11,6 +11,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.pbccrc.api.bean.ResultContent;
 import org.pbccrc.api.biz.ComplexBiz;
 import org.pbccrc.api.util.Constants;
 import org.pbccrc.api.util.PdfBuilder;
@@ -62,5 +63,30 @@ public class ComplexRest {
 		result.put("isNull", isNull);
 		
 		return Response.ok(result).build();
+	}
+	
+	@GET
+	@Path("/quota")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response queryQuota(@QueryParam("identifier") String identifier) throws Exception{
+		
+		ResultContent resultContent = new ResultContent();
+		resultContent.setErrNum(Constants.CODE_ERR_SUCCESS);
+		resultContent.setRetMsg(Constants.CODE_ERR_SUCCESS_MSG);
+		
+		Map<String, Object> queryResult = complexBiz.queryQuota(identifier);
+		
+		// 判断内码中是否存在被查询用户
+		String isNull = "N";
+		isNull = String.valueOf(queryResult.get("isNull"));
+		if ("Y".equals(isNull)) {
+			resultContent.setErrNum(Constants.CODE_ERR_FAIL);
+			resultContent.setRetMsg(Constants.CODE_ERR_FAIL_MSG);
+			return Response.ok(resultContent.toString()).build();
+		}
+		
+		resultContent.setRetData(JSONObject.toJSONString(queryResult));
+		
+		return Response.ok(resultContent.toString()).build();
 	}
 }

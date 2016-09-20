@@ -233,4 +233,49 @@ public class ComplexBizImpl implements ComplexBiz {
 		
 		return returnMap;
 	}
+	
+	/**
+	 * 可授信额度查询
+	 * @param identifier
+	 * @return
+	 * @throws Exception
+	 */
+	public Map<String, Object> queryQuota(String identifier) throws Exception {
+		
+		Map<String, Object> returnMap = new HashMap<String, Object>();
+		
+		// 获取授信额度信息
+		String credit = "暂无信息";
+		StringBuffer url = new StringBuffer(Constants.URL_LDB_QUERY);
+		url.append(Constants.URL_CONNECTOR);
+		url.append("idCardNo");
+		url.append(Constants.EQUAL);
+		url.append(identifier);
+		url.append(Constants.URL_PARAM_CONNECTOR);
+		url.append("service");
+		url.append(Constants.EQUAL);
+		url.append(Constants.SERVICE_LDB_CREDIT);
+		credit = remoteApiOperator.remoteAccept(url.toString());
+		JSONObject creditObj = JSONObject.parseObject(credit);
+		String isNull = creditObj.getString("isNull");
+		if ("N".equals(isNull)) {
+			creditObj.remove("isNull");
+		}
+		returnMap.put("credit", creditObj);
+		
+		// 获取用户信用评分信息
+		String score = "暂无分数"; 
+		String service = Constants.SERVICE_S_QUERYSCORE;
+		Map<String, String[]> params = new HashMap<String, String[]>();
+		params.put("identityCard", new String[]{identifier});
+		String result = queryApiBiz.query(service, params);
+		JSONObject resultObj = JSONObject.parseObject(result);
+		String resultScore = resultObj.getString("score");
+		if (!StringUtil.isNull(resultScore)) {
+			score = resultScore;
+		}
+		returnMap.put("score", score);
+		
+		return returnMap;
+	}
 }

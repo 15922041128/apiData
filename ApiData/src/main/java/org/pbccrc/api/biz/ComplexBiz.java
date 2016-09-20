@@ -10,5 +10,13 @@ public interface ComplexBiz {
 	 * @return
 	 */
 	public Map<String, Object> querySxr(String identifier, String[] queryItems) throws Exception;
+	
+	/**
+	 * 可授信额度查询
+	 * @param identifier
+	 * @return
+	 * @throws Exception
+	 */
+	public Map<String, Object> queryQuota(String identifier) throws Exception;
 
 }

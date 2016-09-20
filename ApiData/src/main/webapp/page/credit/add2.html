@@ -80,7 +80,7 @@ function toSubmit(){
 	    }
 	}
 	
-	if (balance > totalAmount) {
+	if (parseInt(balance) > parseInt(totalAmount)) {
 		swal("余额应小于等于总金额!");
 		return false;
 	}

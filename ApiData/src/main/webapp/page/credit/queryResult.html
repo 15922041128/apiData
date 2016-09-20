@@ -87,7 +87,6 @@ $(document).ready(function() {
 	        	$.each(reditList, function (i, data) {
 	        		var tr = "<tr>";
 	                var tr = tr + "<td>" + data.contactDate + "</td>"
-	                + " <td>" + data.loanDate + "</td>"
                 	+ " <td>" + data.hireDate + "</td>"
                 	+ " <td>" + data.expireDate + "</td>"
                 	+ " <td>" + data.loanUsed + "</td>"
@@ -204,9 +203,6 @@ function insertNullTable(){
 		<tr nowrap>
 			<th>
 				合同日期
-			</th>
-			<th>
-				放款日期
 			</th>
 			<th>
 				起租日

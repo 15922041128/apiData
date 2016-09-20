@@ -149,9 +149,19 @@ public class Constants {
 	// 涉诉信息(从裁判文书中查询某人)
 	public static final String SERVICE_S_UCACCIND_CPWS = "s-ucaccindCPWS";
 	
-	/** 本地访问用url */
+	/** 本地访问用url(local DB) */
 	// 失信人被执行信息
 	public static final String URL_LDB_GETSXR = "http://127.0.0.1:8080/ApiData/r/ldb/getSxr";
+	// 本地api查询接口
+	public static final String URL_LDB_QUERY = "http://127.0.0.1:8080/ApiData/r/ldb/query";
+	
+	/** 本地访问用service(local DB) */
+	// 授信信息
+	public static final String SERVICE_LDB_CREDIT = "credit";
+	
+	/** remote url */
+	// 行为评分
+	public static final String REMOTE_URL_SCORE = "http://www.qilingyz.com/api.php?m=open.score";
 	
 	/** 查询参数项 */
 	// 人员基本信息
