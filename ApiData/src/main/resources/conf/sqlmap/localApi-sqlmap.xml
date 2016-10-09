@@ -7,4 +7,8 @@
 		select * from localApi where service = #{service}
 	</select>
 	
+	<select id="queryAll" resultType="java.util.HashMap">
+		select * from localApi
+	</select>
+	
 </mapper>

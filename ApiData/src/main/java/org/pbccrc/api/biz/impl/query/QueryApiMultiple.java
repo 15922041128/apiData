@@ -43,7 +43,9 @@ public class QueryApiMultiple implements QueryApi {
 
 	@Override
 	@SuppressWarnings("rawtypes")
-	public String query(Map<String, Object> localApi, Map urlParams) throws Exception {
+	public Map<String, Object> query(Map<String, Object> localApi, Map urlParams) throws Exception {
+		
+		Map<String, Object> map = new HashMap<String, Object>();
 		
 		// 返回字符串
 		String resultStr = Constants.BLANK;
@@ -59,6 +61,9 @@ public class QueryApiMultiple implements QueryApi {
 		
 		// 获得远程api
 		List<Map<String, Object>> remoteApiList = remoteApiDao.getRemoteApiByLocal(Integer.parseInt(String.valueOf(localApi.get("ID"))));
+		
+		// 查询成功标识
+		boolean isSuccess = false;
 		
 		// 遍历远程api
 		for (int i = 0; i < remoteApiList.size(); i++) {
@@ -188,7 +193,10 @@ public class QueryApiMultiple implements QueryApi {
 					if (null == urlParams.get(paramName)) {
 						resultContent.setErrNum(Constants.ERR_URL_INVALID);
 						resultContent.setRetMsg(Constants.RET_MSG_URL_INVALID + paramName);
-						return resultContent.toString();
+						
+						map.put("result", resultContent.toString());
+						map.put("isSuccess", false);
+						return map;
 					}
 					// 设置远程访问参数
 					// 判断参数类型
@@ -298,7 +306,10 @@ public class QueryApiMultiple implements QueryApi {
 				Map<String, Object> code = codeDao.queryByCode(Constants.CODE_ERR_FAIL);
 				resultContent.setErrNum(Constants.CODE_ERR_FAIL);
 				resultContent.setRetMsg(String.valueOf(code.get("codeValue")));
-				return resultContent.toString();
+				
+				map.put("result", resultContent.toString());
+				map.put("isSuccess", false);
+				return map;
 			}
 			
 			
@@ -316,7 +327,10 @@ public class QueryApiMultiple implements QueryApi {
 					Map<String, Object> code = codeDao.queryByCode(Constants.CODE_ERR_FAIL);
 					resultContent.setErrNum(Constants.CODE_ERR_FAIL);
 					resultContent.setRetMsg(String.valueOf(code.get("codeValue")));
-					return resultContent.toString();
+					
+					map.put("result", resultContent.toString());
+					map.put("isSuccess", false);
+					return map;
 				} else {
 					continue;
 				}
@@ -333,7 +347,10 @@ public class QueryApiMultiple implements QueryApi {
 					Map<String, Object> code = codeDao.queryByCode(Constants.CODE_ERR_FAIL);
 					resultContent.setErrNum(Constants.CODE_ERR_FAIL);
 					resultContent.setRetMsg(String.valueOf(code.get("codeValue")));
-					return resultContent.toString();
+					
+					map.put("result", resultContent.toString());
+					map.put("isSuccess", false);
+					return map;
 				} else {
 					continue;
 				}
@@ -350,7 +367,10 @@ public class QueryApiMultiple implements QueryApi {
 					Map<String, Object> code = codeDao.queryByCode(Constants.CODE_ERR_FAIL);
 					resultContent.setErrNum(Constants.CODE_ERR_FAIL);
 					resultContent.setRetMsg(String.valueOf(code.get("codeValue")));
-					return resultContent.toString();
+					
+					map.put("result", resultContent.toString());
+					map.put("isSuccess", false);
+					return map;
 				} else {
 					continue;
 				}
@@ -409,6 +429,7 @@ public class QueryApiMultiple implements QueryApi {
 							resultStr = resultContent.toString();
 						}
 					}
+					isSuccess = true;
 					break;
 				} else {
 					// error
@@ -437,7 +458,11 @@ public class QueryApiMultiple implements QueryApi {
 			}
 			
 		} // loop remoteApiList end
-		return resultStr;
+		
+		map.put("result", resultStr);
+		map.put("isSuccess", isSuccess);
+		
+		return map;
 	}
 	
 	@SuppressWarnings("rawtypes")

@@ -9,7 +9,7 @@ public class ResultContent {
 	private String retMsg;
 
 	/** 返回数据 */
-	private String retData;
+	private Object retData;
 	
 	public String toString() {
 		
@@ -32,11 +32,11 @@ public class ResultContent {
 		this.retMsg = retMsg;
 	}
 
-	public String getRetData() {
+	public Object getRetData() {
 		return retData;
 	}
 
-	public void setRetData(String retData) {
+	public void setRetData(Object retData) {
 		this.retData = retData;
 	}
 	

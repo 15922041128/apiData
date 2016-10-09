@@ -89,6 +89,13 @@ public class StringUtil {
 	    int vCode = tmp % (max - min + 1) + min;
 	    return String.valueOf(vCode);
     }
+    
+    public static String null2Blank(String str) {
+    	if (isNull(str)) {
+    		return Constants.BLANK;
+    	}
+    	return str;
+    }
       
     public static void main(String[] args) {  
         System.out.println( decodeUnicode("\u8eab\u4efd\u8bc1\u53f7\u7801\u4e0d\u5408\u6cd5\uff01"));  

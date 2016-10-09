@@ -13,14 +13,48 @@ import sun.misc.BASE64Encoder;
 public class DesUtils {
  
     private final static String DES = "DES";
+    private static final String KEY = "0002000200020002";
  
-    public static void main(String[] args) throws Exception {
-        String data = "123 456";
-        String key = "wang!@#$%";
-        System.err.println(encrypt(data, key));
-        System.err.println(decrypt(encrypt(data, key), key));
- 
-    }
+	public static void main(String[] args) throws Exception {
+//		String data = "123 456";
+//		String key = "wang!@#$%";
+//		System.err.println(encrypt(data, key));
+//		System.err.println(decrypt(encrypt(data, key), key));
+		String driverClassName = "com.mysql.jdbc.Driver";
+		String url = "jdbc:mysql://127.0.0.1:3306/apidb?useUnicode=true&amp;characterEncoding=UTF-8&amp;zeroDateTimeBehavior=convertToNull";
+		String username = "root";
+		String passwrod = "root";
+		String username2 = "openApi";
+		String passwrod2 = "1234qwer";
+		
+		driverClassName = encrypt(driverClassName, KEY);
+		url = encrypt(url, KEY);
+		username = encrypt(username, KEY);
+		passwrod = encrypt(passwrod, KEY);
+		username2 = encrypt(username2, KEY);
+		passwrod2 = encrypt(passwrod2, KEY);
+		
+		System.out.println("加密后 : " + driverClassName);
+		System.out.println("加密后 : " + url);
+		System.out.println("加密后 : " + username);
+		System.out.println("加密后 : " + passwrod);
+		System.out.println("加密后 : " + username2);
+		System.out.println("加密后 : " + passwrod2);
+		
+		driverClassName = decrypt(driverClassName, KEY);
+		url = decrypt(url, KEY);
+		username = decrypt(username, KEY);
+		passwrod = decrypt(passwrod, KEY);
+		username2 = decrypt(username2, KEY);
+		passwrod2 = decrypt(passwrod2, KEY);
+		
+		System.out.println("解密后 : " + driverClassName);
+		System.out.println("解密后 : " + url);
+		System.out.println("解密后 : " + username);
+		System.out.println("解密后 : " + passwrod);
+		System.out.println("解密后 : " + username2);
+		System.out.println("解密后 : " + passwrod2);
+	}
      
     /**
      * Description 根据键值进行加密

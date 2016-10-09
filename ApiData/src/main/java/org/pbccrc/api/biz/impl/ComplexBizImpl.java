@@ -78,7 +78,7 @@ public class ComplexBizImpl implements ComplexBiz {
 		String service = Constants.SERVICE_S_QUERYSCORE;
 		Map<String, String[]> params = new HashMap<String, String[]>();
 		params.put("identityCard", new String[]{identifier});
-		String result = queryApiBiz.query(service, params);
+		String result = String.valueOf(queryApiBiz.query(service, params).get("result"));
 		JSONObject resultObj = JSONObject.parseObject(result);
 		String resultScore = resultObj.getString("score");
 		if (!StringUtil.isNull(resultScore)) {
@@ -133,7 +133,7 @@ public class ComplexBizImpl implements ComplexBiz {
 				params = new HashMap<String, String[]>();
 				params.put("NAME", new String[]{name});
 				params.put("CERTNO", new String[]{identifier});
-				String gjj = queryApiBiz.query(service, params);
+				String gjj = String.valueOf(queryApiBiz.query(service, params).get("result"));
 				JSONObject ggjObj = JSONObject.parseObject(gjj);
 				JSONObject ggjResult = ggjObj.getJSONObject("Result");
 				if (null != ggjResult){
@@ -153,7 +153,7 @@ public class ComplexBizImpl implements ComplexBiz {
 				params = new HashMap<String, String[]>();
 				params.put("pname", new String[]{name});
 				params.put("idcardNo", new String[]{identifier});
-				String zxgg = queryApiBiz.query(service, params);
+				String zxgg = String.valueOf(queryApiBiz.query(service, params).get("result"));
 				zxggObj = JSONObject.parseObject(zxgg);
 				JSONArray zxggArray = new JSONArray();
 				JSONObject zxggResultObject = zxggObj.getJSONObject("Result");
@@ -176,7 +176,7 @@ public class ComplexBizImpl implements ComplexBiz {
 				params = new HashMap<String, String[]>();
 				params.put("pname", new String[]{name});
 				params.put("idcardNo", new String[]{identifier});
-				String sxgg = queryApiBiz.query(service, params);
+				String sxgg = String.valueOf(queryApiBiz.query(service, params).get("result"));
 				sxggObj = JSONObject.parseObject(sxgg);
 				JSONArray sxggArray = new JSONArray();
 				JSONObject sxggResultObject = sxggObj.getJSONObject("Result");
@@ -199,7 +199,7 @@ public class ComplexBizImpl implements ComplexBiz {
 				params = new HashMap<String, String[]>();
 				params.put("pname", new String[]{name});
 				params.put("idcardNo", new String[]{identifier});
-				String cpws = queryApiBiz.query(service, params);
+				String cpws = String.valueOf(queryApiBiz.query(service, params).get("result"));
 				cpwsObj = JSONObject.parseObject(cpws);
 				JSONArray cpwsArray = new JSONArray();
 				JSONObject cpwsResultObject = cpwsObj.getJSONObject("Result");
@@ -268,7 +268,7 @@ public class ComplexBizImpl implements ComplexBiz {
 		String service = Constants.SERVICE_S_QUERYSCORE;
 		Map<String, String[]> params = new HashMap<String, String[]>();
 		params.put("identityCard", new String[]{identifier});
-		String result = queryApiBiz.query(service, params);
+		String result = String.valueOf(queryApiBiz.query(service, params).get("result"));
 		JSONObject resultObj = JSONObject.parseObject(result);
 		String resultScore = resultObj.getString("score");
 		if (!StringUtil.isNull(resultScore)) {

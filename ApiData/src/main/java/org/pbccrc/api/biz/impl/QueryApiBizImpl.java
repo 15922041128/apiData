@@ -1,6 +1,7 @@
 package org.pbccrc.api.biz.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -31,7 +32,9 @@ public class QueryApiBizImpl implements QueryApiBiz{
 	
 	@Override
 	@SuppressWarnings("rawtypes")
-	public String query(String service, Map urlParams) throws Exception {
+	public Map<String, Object> query(String service, Map urlParams) throws Exception {
+		
+		Map<String, Object> map = new HashMap<String, Object>();
 		
 		// 返回信息对象
 		ResultContent resultContent = new ResultContent();
@@ -105,6 +108,9 @@ public class QueryApiBizImpl implements QueryApiBiz{
 				result = resultContent.toString();
 			}
 			
+			map.put("result", result);
+			map.put("isSuccess", true);
+			
 		} else {
 			// 本地api无数据 查询外部api
 			
@@ -124,10 +130,10 @@ public class QueryApiBizImpl implements QueryApiBiz{
 			
 			queryApi = (QueryApi)clazz.newInstance();
 			
-			result = queryApi.query(localApi, urlParams);
+			map = queryApi.query(localApi, urlParams);
 		}
 		
-		return result;
+		return map;
 	}
 
 }

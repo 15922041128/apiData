@@ -2,6 +2,9 @@ package org.pbccrc.api.biz;
 
 import java.io.File;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.fileupload.FileItem;
 import org.pbccrc.api.bean.User;
 
 import com.alibaba.fastjson.JSONObject;
@@ -41,5 +44,13 @@ public interface PersonBiz {
 	 * @return
 	 */
 	public JSONObject getReditList(String name, String idCardNo) throws Exception;
+	
+	/**
+	 * 批量报送
+	 * @param fileItem
+	 * @param request
+	 * @throws Exception
+	 */
+	public String addAll(FileItem fileItem, HttpServletRequest request) throws Exception;
 	
 }

@@ -1,5 +1,7 @@
 package org.pbccrc.api.rest;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -7,14 +9,18 @@ import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.pbccrc.api.bean.ResultContent;
+import org.pbccrc.api.bean.SystemLog;
 import org.pbccrc.api.biz.CostBiz;
 import org.pbccrc.api.biz.QueryApiBiz;
 import org.pbccrc.api.dao.LocalApiDao;
+import org.pbccrc.api.dao.SystemLogDao;
 import org.pbccrc.api.util.Constants;
 import org.pbccrc.api.util.RemoteApiOperator;
 import org.pbccrc.api.util.StringUtil;
@@ -43,8 +49,12 @@ public class QueryApiRest {
 	@Autowired
 	private RemoteApiOperator remoteApiOperator;
 	
+	@Autowired
+	private SystemLogDao systemLogDao;
+	
 	@GET
 	@Path("/get")
+	@Produces(MediaType.APPLICATION_JSON)
 	@SuppressWarnings("rawtypes")
 	public Response query(@QueryParam("service") String service, @Context HttpServletRequest request) throws Exception {
 		
@@ -79,13 +89,21 @@ public class QueryApiRest {
 		// 获取本地api
 		Map<String, Object> localApi = localApiDao.queryByService(isSingle + Constants.CONNECTOR_LINE + target);
 		
+		// 验证本地是否有该api
+		if (null == localApi) {
+			resultContent.setErrNum(Constants.ERR_NO_SERVICE);
+			resultContent.setRetMsg(Constants.RET_MSG_NO_SERVICE);
+			return Response.ok(JSONObject.toJSON(resultContent)).build();
+		}
+		
 		// 请求参数验证
 		if (!validator.validateRequest(userID, apiKey, localApi, urlParams, resultContent)) {
 			result = JSONObject.toJSONString(resultContent);
 			return Response.ok(result).build();
 		}
 		
-		result = queryApiBiz.query(service, urlParams);
+		Map<String, Object> map = queryApiBiz.query(service, urlParams);
+		result = String.valueOf(map.get("result"));
 		JSONObject resultJson = JSONObject.parseObject(result);
 		
 		// 计费
@@ -152,15 +170,48 @@ public class QueryApiRest {
 				}
 			}
 			if (isCost) {
-				costBiz.cost(Constants.COST_TYPE_COUNT, userID, apiKey, localApi);	
+				costBiz.cost(userID, apiKey, localApi);	
 			}
 		}
+		
+		// 记录日志
+		SystemLog systemLog = new SystemLog();
+		// ip地址
+		systemLog.setIpAddress(request.getRemoteAddr());
+		// apiKey
+		systemLog.setApiKey(apiKey);
+		// localApiID
+		systemLog.setLocalApiID(String.valueOf(localApi.get("ID")));
+		// 参数
+		JSONObject params = new JSONObject();
+		String localParams = String.valueOf(localApi.get("params"));
+		JSONArray localParamArray = JSONArray.parseArray(localParams);
+		for (Object o : localParamArray) {
+			JSONObject object = (JSONObject)o;
+			String paramName = String.valueOf(object.get("paramName"));
+			String paramType = String.valueOf(object.get("paramType"));
+			if (Constants.PARAM_TYPE_URL.equals(paramType) 
+					&& null != urlParams.get(paramName) && !StringUtil.isNull(((String[])urlParams.get(paramName))[0])) {
+				params.put(paramName, ((String[])urlParams.get(paramName))[0]);
+			}
+		}
+		systemLog.setParams(params.toJSONString());
+		// 用户ID
+		systemLog.setUserID(userID);
+		// 是否成功
+		systemLog.setIsSuccess(String.valueOf(map.get("isSuccess")));
+		// 是否计费
+		systemLog.setIsCount(String.valueOf(isCount));
+		// 查询时间
+		systemLog.setQueryDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+		systemLogDao.addLog(systemLog);
 		
 		return Response.ok(result).build();
 	}
 	
 	@GET
 	@Path("/score")
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response score(@Context HttpServletRequest request) throws Exception {
 		
 		ResultContent content = new ResultContent();
@@ -184,7 +235,7 @@ public class QueryApiRest {
 			content.setRetData(result);
 		}
 		
-		return Response.ok(content.toString()).build();
+		return Response.ok(JSONObject.toJSON(content)).build();
 	}
 	
 }

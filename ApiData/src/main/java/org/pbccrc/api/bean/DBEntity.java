@@ -19,6 +19,17 @@ public class DBEntity {
 	
 	/** sql语句 */
 	private String sql;
+	
+	/** 查询字段 */
+	private String[] selectItems;
+	
+	public String[] getSelectItems() {
+		return selectItems;
+	}
+
+	public void setSelectItems(String[] selectItems) {
+		this.selectItems = selectItems;
+	}
 
 	public String getTableName() {
 		return tableName;

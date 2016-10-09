@@ -38,7 +38,9 @@ public class QueryApiSingle implements QueryApi {
 
 	@Override
 	@SuppressWarnings("rawtypes")
-	public String query(Map<String, Object> localApi, Map urlParams) throws Exception{
+	public Map<String, Object> query(Map<String, Object> localApi, Map urlParams) throws Exception{
+		
+		Map<String, Object> map = new HashMap<String, Object>();
 		
 		String resultStr = Constants.BLANK;
 		
@@ -403,7 +405,10 @@ public class QueryApiSingle implements QueryApi {
 			}
 		}
 		
-		return resultStr;
+		map.put("result", resultStr);
+		map.put("isSuccess", isSuccess);
+		
+		return map;
 	}
 
 	@SuppressWarnings("rawtypes")

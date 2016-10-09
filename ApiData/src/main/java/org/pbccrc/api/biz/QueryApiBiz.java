@@ -5,6 +5,6 @@ import java.util.Map;
 public interface QueryApiBiz {
 	
 	@SuppressWarnings("rawtypes")
-	public String query(String service, Map urlParams) throws Exception;
+	public Map<String, Object> query(String service, Map urlParams) throws Exception;
 
 }

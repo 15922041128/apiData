@@ -23,7 +23,7 @@ public class DBOperator extends AbstractMyBatisDao{
 		
 		for (int i = 0; i < fields.size(); i++) {
 			sql.append(Constants.AND);
-			sql.append(fields.get(i));
+			sql.append("t." + fields.get(i));
 			sql.append(Constants.EQUAL);
 			sql.append(Constants.SINGLE_QUOTES + values.get(i) + Constants.SINGLE_QUOTES);
 			sql.append(Constants.SPACE);
@@ -43,7 +43,7 @@ public class DBOperator extends AbstractMyBatisDao{
 		
 		for (int i = 0; i < fields.size(); i++) {
 			sql.append(Constants.AND);
-			sql.append(fields.get(i));
+			sql.append("t." + fields.get(i));
 			sql.append(Constants.EQUAL);
 			sql.append(Constants.SINGLE_QUOTES + values.get(i) + Constants.SINGLE_QUOTES);
 			sql.append(Constants.SPACE);
@@ -52,6 +52,10 @@ public class DBOperator extends AbstractMyBatisDao{
 		entity.setSql(sql.toString());
 		
 		return getSqlSession().selectList("dao.dbOperator.queryData", entity);
+	}
+	
+	public void updateData(DBEntity entity) {
+		getSqlSession().update("dao.dbOperator.updateData", entity);
 	}
 
 }

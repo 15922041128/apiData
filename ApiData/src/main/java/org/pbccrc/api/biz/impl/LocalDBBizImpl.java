@@ -90,7 +90,7 @@ public class LocalDBBizImpl implements LocalDBBiz {
 	 * @return
 	 * @throws Exception
 	 */
-	public String getSxr(String idCardNo) throws Exception {
+	public List<Map<String, Object>> getSxr(String idCardNo) throws Exception {
 		
 		String tableName = "ldb_dishonest_info";
 		DBEntity entity = new DBEntity();
@@ -101,9 +101,18 @@ public class LocalDBBizImpl implements LocalDBBiz {
 		values.add(idCardNo);
 		entity.setFields(fields);
 		entity.setValues(values);
+		
+		String[] selectItems = new String[]{
+				Constants.LDB_DISHONEST_INFO_CARDNUM, Constants.LDB_DISHONEST_INFO_COURT_NAME, 
+				Constants.LDB_DISHONEST_INFO_CASE_CODE, Constants.LDB_DISHONEST_INFO_INAME, 
+				Constants.LDB_DISHONEST_INFO_PERFORMANCE, Constants.LDB_DISHONEST_INFO_PUBLISH_DATE,
+				Constants.LDB_DISHONEST_INFO_AREA_NAME, Constants.LDB_DISHONEST_INFO_DUTY,
+				Constants.LDB_DISHONEST_INFO_DISREPUT_TYPE_NAME};
+		entity.setSelectItems(selectItems);
+		
 		List<Map<String, Object>> dishonestList = dbOperator.queryDatas(entity);
 		
-		return JSON.toJSONString(dishonestList);
+		return dishonestList;
 	}
 	
 	/**

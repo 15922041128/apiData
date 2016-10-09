@@ -1,5 +1,6 @@
 package org.pbccrc.api.biz;
 
+import java.util.List;
 import java.util.Map;
 
 public interface LocalDBBiz {
@@ -19,7 +20,7 @@ public interface LocalDBBiz {
 	 * @return
 	 * @throws Exception
 	 */
-	public String getSxr(String idCardNo) throws Exception;
+	public List<Map<String, Object>> getSxr(String idCardNo) throws Exception;
 	
 	/**
 	 * 查询本地api

@@ -11,5 +11,5 @@ public interface QueryApi {
 	 * @throws Exception
 	 */
 	@SuppressWarnings("rawtypes")
-	public String query(Map<String, Object> localApi, Map urlParams) throws Exception;
+	public Map<String, Object> query(Map<String, Object> localApi, Map urlParams) throws Exception;
 }

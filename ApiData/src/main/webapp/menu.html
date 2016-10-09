@@ -12,14 +12,6 @@
 </style>
 		
 <script type="text/javascript">
-function toPush(){
-	parent.document.getElementById("mainFrame").src = "page/credit/add.html";
-}
-
-function toQuery(){
-	parent.document.getElementById("mainFrame").src = "page/credit/query.html";
-}
-
 function modifyPassword(){
 	parent.document.getElementById("mainFrame").src = "resetPassword.html";
 }
@@ -28,14 +20,21 @@ function modifyBaseInfo(){
 	parent.document.getElementById("mainFrame").src = "modifyUser.html";
 }
 
+function toPush(){
+	parent.document.getElementById("mainFrame").src = "page/credit/add.html";
+}
+
+function toQuery(){
+	parent.document.getElementById("mainFrame").src = "page/credit/query.html";
+}
+
 function toPushAll(){
-	alert('pushAll');
+	parent.document.getElementById("mainFrame").src = "page/credit/addAll.html";
 }
 
 function toQueryAll(){
 	alert('queryAll');
 }
-
 </script>
 </head>
 	
@@ -55,9 +54,13 @@ function toQueryAll(){
 	      <a class="m2 margin_left_20" href="#" onfocus="this.blur()" style="color: rgb(102, 102, 102);"><span>信息服务 &gt;</span><label id="reportno1"></label></a>
 	      <ul style="width: 170px; margin-left: 15px; padding-bottom: 18px; display: none;">
 	          <li><a href="#" style="color: rgb(102, 102, 102);" onclick="toPush()">信用风险信息报送</a></li>
+	          <!--  -->
 	          <li><a href="#" style="color: rgb(102, 102, 102);" onclick="toPushAll()">信用风险批量报送</a></li>
+	          
 	          <li><a href="#" style="color: rgb(102, 102, 102);" onclick="toQuery()">信用风险信息查询</a></li>
-	           <li><a href="#" style="color: rgb(102, 102, 102);" onclick="toQueryAll()">信用风险批量查询</a></li>
+	          <!--  
+	          <li><a href="#" style="color: rgb(102, 102, 102);" onclick="toQueryAll()">信用风险批量查询</a></li>
+	          -->
 	      </ul>
 	    </li>
 	    

@@ -34,6 +34,8 @@ public class Constants {
 	
 	// pdf导出目录
 	public static final String FILE_DOWNLOAD_SXR_PDF = "/files/download/sxr/pdf";//pdf导出目录
+	// 上传错误文件目录
+	public static final String UPLOAD_ERROR_FILE = "/files/download/uploadError";
 	
 	/** 返回code */
 	public static final String RET_CODE_SUCCESS = "success";
@@ -111,6 +113,18 @@ public class Constants {
 	public static final String ERR_MISSING_USER_ID = "100107";
 	public static final String RET_MSG_MISSING_USER_ID = "缺少userID";
 	
+	// 查询接口不存在
+	public static final String ERR_NO_SERVICE = "100108";
+	public static final String RET_MSG_NO_SERVICE = "查询接口不存在";
+	
+	// 查询无结果
+	public static final String ERR_NO_RESULT = "100109";
+	public static final String RET_MSG_NO_RESULT = "查询无结果";
+	
+	// 余额或信用额不足
+	public static final String ERR_BLANCE_NOT_ENOUGH = "100110";
+	public static final String RET_MSG_BLANCE_NOT_ENOUGH = "余额或信用额不足";
+	
 	// 缺少service或service格式不正确
 	public static final String ERR_SERVICE = "101001";
 	public static final String RET_MSG_SERVICE = "缺少service或service格式不正确";
@@ -124,6 +138,25 @@ public class Constants {
 	
 	/**  table filed   */
 	public static final String API_KEY = "apiKey";
+	/** ldb_dishonest_info */
+	// 被执行人身份证号码
+	public static final String LDB_DISHONEST_INFO_CARDNUM = "CARDNUM";
+	// 执行法院
+	public static final String LDB_DISHONEST_INFO_COURT_NAME = "COURT_NAME";
+	// 案号
+	public static final String LDB_DISHONEST_INFO_CASE_CODE = "CASE_CODE";
+	// 被执行人姓名
+	public static final String LDB_DISHONEST_INFO_INAME = "INAME";
+	// 执行情况
+	public static final String LDB_DISHONEST_INFO_PERFORMANCE = "PERFORMANCE";
+	// 发布时间
+	public static final String LDB_DISHONEST_INFO_PUBLISH_DATE = "PUBLISH_DATE";
+	// 省份名称
+	public static final String LDB_DISHONEST_INFO_AREA_NAME = "AREA_NAME";
+	// 职责
+	public static final String LDB_DISHONEST_INFO_DUTY = "DUTY";
+	// 失信被执行人行为具体情形
+	public static final String LDB_DISHONEST_INFO_DISREPUT_TYPE_NAME = "DISREPUT_TYPE_NAME";
 	
 	// person
 	public static final String PERSON_ID = "ID";
@@ -134,8 +167,8 @@ public class Constants {
 	public static final String CONDITION_TYPE_REGEX = "regex";
 	
 	/** cost type */
-	public static final String COST_TYPE_COUNT = "count";
-	public static final String COST_TYPE_PRICE = "price";
+	public static final String COST_TYPE_COUNT = "0";
+	public static final String COST_TYPE_PRICE = "1";
 	
 	/** 本地访问用service */
 	// 个人信用分

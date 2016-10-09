@@ -1,5 +1,6 @@
 package org.pbccrc.api.rest;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -55,13 +56,24 @@ public class LocalDBRest {
 	 */
 	@GET
 	@Path("/getSxr")
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response getSxr(@QueryParam("idCardNo") String idCardNo) throws Exception {
 		
-		String result = Constants.BLANK;
+		JSONObject object = new JSONObject();
+		object.put("errNum", Constants.CODE_ERR_SUCCESS);
+		object.put("retMsg", Constants.CODE_ERR_SUCCESS_MSG);
 		
-		result = localDBBiz.getSxr(idCardNo);
+		List<Map<String, Object>> dishonestList = localDBBiz.getSxr(idCardNo);
 		
-		return Response.ok(result).build();
+		if (null == dishonestList || dishonestList.size() == 0) {
+			object.put("errNum", Constants.ERR_NO_RESULT);
+			object.put("retMsg", Constants.RET_MSG_NO_RESULT);
+			return Response.ok(object).build();
+		}
+		
+		object.put("retData", dishonestList);
+		
+		return Response.ok(object).build();
 	}
 	
 	@GET

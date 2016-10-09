@@ -107,4 +107,16 @@ public class PersonRest {
 		return Response.ok(obj).location(new URI("page/credit/queryResult.html")).build();
 	}
 
+	@POST
+	@Path("/addAll")
+	@Produces({MediaType.MULTIPART_FORM_DATA, MediaType.APPLICATION_JSON})
+	public Response addAll(@Context HttpServletRequest request) throws Exception {
+		DiskFileUpload fu = new DiskFileUpload();
+		FileItem fileItem = fu.parseRequest(request).get(0);
+		String exportPath = personBiz.addAll(fileItem, request);
+		JSONObject result = new JSONObject();
+		exportPath = exportPath.substring(exportPath.indexOf("\\ApiData"));
+		result.put("filePath", exportPath);
+		return Response.ok(result).build();
+	}
 }

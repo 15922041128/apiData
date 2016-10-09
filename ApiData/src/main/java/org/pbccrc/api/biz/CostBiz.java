@@ -5,9 +5,11 @@ import java.util.Map;
 public interface CostBiz {
 	
 	/**
-	 * @param costType  计费类型
-	 * @param localApi  localApi
+	 * 计费
+	 * @param userID
+	 * @param apiKey
+	 * @param localApi
 	 */
-	public void cost(String costType, String userID, String apiKey, Map<String, Object> localApi);
+	public void cost(String userID, String apiKey, Map<String, Object> localApi);
 
 }
