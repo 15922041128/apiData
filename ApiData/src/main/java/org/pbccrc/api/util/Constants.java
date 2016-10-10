@@ -36,6 +36,8 @@ public class Constants {
 	public static final String FILE_DOWNLOAD_SXR_PDF = "/files/download/sxr/pdf";//pdf导出目录
 	// 上传错误文件目录
 	public static final String UPLOAD_ERROR_FILE = "/files/download/uploadError";
+	// 批量查询文件目录
+	public static final String BATCH_QUERY_FILE = "/files/download/batchQuery";
 	
 	/** 返回code */
 	public static final String RET_CODE_SUCCESS = "success";

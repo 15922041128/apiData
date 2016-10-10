@@ -41,7 +41,6 @@ $(document).ready(function() {
 	        url: getLocation() + "/r/person/query?name="+name+"&idCardNo="+idCardNo, 
 	        // data: params,
 	        success: function(datas){
-	        	
 	        	var status = datas.status;
 	        	
 	        	if ('error' == status) {

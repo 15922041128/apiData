@@ -53,4 +53,12 @@ public interface PersonBiz {
 	 */
 	public String addAll(FileItem fileItem, HttpServletRequest request) throws Exception;
 	
+	/**
+	 * 批量查询
+	 * @param fileItem
+	 * @param request
+	 * @throws Exception
+	 */
+	public String queryAll(FileItem fileItem, HttpServletRequest request) throws Exception;
+	
 }

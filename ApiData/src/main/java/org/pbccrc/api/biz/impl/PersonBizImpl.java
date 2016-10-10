@@ -88,7 +88,7 @@ public class PersonBizImpl implements PersonBiz {
 		pBaseInfo.put("personID", personID);
 		pBaseInfo.put("tel", tel);
 		pBaseInfo.put("address", address);
-		pBaseInfo.put("photo", photo != null ? photo.getPath() : "");
+		pBaseInfo.put("photo", photo != null ? photo.getPath() : Constants.BLANK);
 		
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		
@@ -481,7 +481,7 @@ public class PersonBizImpl implements PersonBiz {
 				 
 				 address = province + city + area + address;
 				 
-				 // TODO insertDB
+				 // insertDB
 				 // 获取当前时间
 				 SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 				 String currentDate = format.format(new Date());
@@ -508,6 +508,7 @@ public class PersonBizImpl implements PersonBiz {
 				 pBaseInfo.put("personID", personID);
 				 pBaseInfo.put("tel", tel);
 				 pBaseInfo.put("address", address);
+				 pBaseInfo.put("photo", Constants.BLANK);
 
 				 /** p_baseInfo表操作 */
 				 // 即使存在相同数据,依然保留
@@ -546,7 +547,6 @@ public class PersonBizImpl implements PersonBiz {
 		errorRow = errorSheet.createRow(failCount++);
 		errorRow.createCell(0).setCellValue("失败" + (totalCount - successCount) + "条");
 		
-		// 判断是否全部成功
 		String exportPath = Constants.BLANK;
 		// 生成返回信息文件
 		OutputStream os = null;
@@ -570,7 +570,234 @@ public class PersonBizImpl implements PersonBiz {
 			}
 		}
 		return exportPath;
+	}
+	
+	/**
+	 * 批量查询
+	 * @param fileItem
+	 * @throws Exception
+	 */
+	public String queryAll(FileItem fileItem, HttpServletRequest request) throws Exception {
+		InputStream inputStream = fileItem.getInputStream();
+		// 获取excel文件
+		XSSFWorkbook workBook = new XSSFWorkbook(inputStream);
+		// 获取sheet页(第一页)
+		XSSFSheet workSheet = workBook.getSheetAt(0);
 		
+		// 总条数
+		int totalCount = 0;
+		// 成功条数
+		int successCount = 0;
+		// 失败条数
+		int failCount = 0;
+		// 基本信息记录数 
+		int baseCount = 0;
+		// 信用信息记录数
+		int reditCount = 0;
+		// 失信人被执行信息记录数
+		int dishonestInfoCount = 0;
+		
+		// 返回查询文件
+		XSSFWorkbook resultBook = new XSSFWorkbook();
+		// 基本信息sheet
+		XSSFSheet baseInfoSheet = resultBook.createSheet("基本信息");
+		XSSFRow baseInfoRow = baseInfoSheet.createRow(baseCount++);
+		baseInfoRow.createCell(0).setCellValue("姓名");
+		baseInfoRow.createCell(1).setCellValue("身份证号");
+		baseInfoRow.createCell(2).setCellValue("手机号");
+		baseInfoRow.createCell(3).setCellValue("地址");
+		baseInfoRow.createCell(4).setCellValue("信用评分");
+		// 信用信息sheet
+		XSSFSheet reditSheet = resultBook.createSheet("信用信息");
+		XSSFRow reditRow = reditSheet.createRow(reditCount++);
+		reditRow.createCell(0).setCellValue("姓名");
+		reditRow.createCell(1).setCellValue("身份证号");
+		reditRow.createCell(2).setCellValue("合同日期");
+		reditRow.createCell(3).setCellValue("起租日");
+		reditRow.createCell(4).setCellValue("到期日");
+		reditRow.createCell(5).setCellValue("贷款用途");
+		reditRow.createCell(6).setCellValue("总金额");
+		reditRow.createCell(7).setCellValue("余额");
+		reditRow.createCell(8).setCellValue("状态");
+		reditRow.createCell(9).setCellValue("业务发生机构");
+		reditRow.createCell(10).setCellValue("日期时间");
+		// 失信人被执行信息sheet
+		XSSFSheet dishonestInfoSheet = resultBook.createSheet("失信人被执行信息");
+		XSSFRow dishonestInfoRow = dishonestInfoSheet.createRow(dishonestInfoCount++);
+		dishonestInfoRow.createCell(0).setCellValue("被执行人姓名");
+		dishonestInfoRow.createCell(1).setCellValue("被执行人身份证号码");
+		dishonestInfoRow.createCell(2).setCellValue("省份");
+		dishonestInfoRow.createCell(3).setCellValue("发布时间");
+		dishonestInfoRow.createCell(4).setCellValue("执行依据号");
+		dishonestInfoRow.createCell(5).setCellValue("被执行人的旅行情况");
+		dishonestInfoRow.createCell(6).setCellValue("执行法院");
+		dishonestInfoRow.createCell(7).setCellValue("生效法律文书确定的义务");
+		dishonestInfoRow.createCell(8).setCellValue("失信被执行人行为具体情形");
+		// 错误信息sheet
+		XSSFSheet errorSheet = resultBook.createSheet("错误信息");
+		XSSFRow errorRow = errorSheet.createRow(failCount++);
+		errorRow.createCell(0).setCellValue("姓名");
+		errorRow.createCell(1).setCellValue("身份证号");
+		errorRow.createCell(2).setCellValue("错误信息");
+		
+		// 遍历第一页所有数据
+		for (int i = 1; i <= workSheet.getLastRowNum(); i++) {
+			 totalCount++;
+			 XSSFRow row = workSheet.getRow(i);
+			 if (null != row) {
+				 // 姓名
+				 String name = getValue(row.getCell(0));
+				 // 身份证号
+				 String idCardNo = getValue(row.getCell(1));
+				 
+				 // 验证姓名
+				 String message = validator.validateName(name);
+				 if (!Constants.BLANK.equals(message)) {
+					 createErrorRow(errorSheet, failCount++, name, idCardNo, message);
+					 continue;
+				 }
+				 
+				 // 验证身份证号
+				 message = validator.validateIDCard(idCardNo);
+				 if (!Constants.BLANK.equals(message)) {
+					 createErrorRow(errorSheet, failCount++, name, idCardNo, message);
+					 continue;
+				 }
+				 
+				 // 获取用户ID
+				 Map<String, String> person = new HashMap<String, String>();
+				 person.put("name", name);
+				 person.put("idCardNo", idCardNo);
+				 Map<String, Object> resPerson = pPersonDao.selectOne(person);
+				 // 验证用户是否存在
+				 if (null == resPerson) {
+					 message = "该人员信息不存在。";
+					 createErrorRow(errorSheet, failCount++, name, idCardNo, message);
+					 continue;
+				 }
+				 String personID = String.valueOf(resPerson.get(Constants.PERSON_ID));
+				 
+				 // 获取用户基本信息
+				 List<Map<String, Object>> pBaseInfoList = pBaseInfoDao.queryByPersonID(personID);
+				 baseInfoRow = baseInfoSheet.createRow(baseCount++);
+				 if (null == pBaseInfoList || pBaseInfoList.size() == 0) {
+					 baseInfoRow.createCell(0).setCellValue(Constants.BLANK);
+					 baseInfoRow.createCell(1).setCellValue(Constants.BLANK);
+					 baseInfoRow.createCell(2).setCellValue(Constants.BLANK);
+					 baseInfoRow.createCell(3).setCellValue(Constants.BLANK);
+				 } else {
+					 Map<String, Object> pBaseInfoMap = pBaseInfoList.get(0);
+					 baseInfoRow.createCell(0).setCellValue(name);
+					 baseInfoRow.createCell(1).setCellValue(idCardNo);
+					 baseInfoRow.createCell(2).setCellValue(StringUtil.null2Blank(String.valueOf(pBaseInfoMap.get("tel"))));
+					 baseInfoRow.createCell(3).setCellValue(StringUtil.null2Blank(String.valueOf(pBaseInfoMap.get("address"))));
+				 }
+					
+				 // 获取用户信用评分信息
+				 String score = "暂无分数"; 
+				 String service = Constants.SERVICE_S_QUERYSCORE;
+				 Map<String, String[]> params = new HashMap<String, String[]>();
+				 params.put("identityCard", new String[]{String.valueOf(resPerson.get("idCardNo"))});
+				 String result = String.valueOf(queryApiBiz.query(service, params).get("result"));
+				 JSONObject resultObj = JSONObject.parseObject(result);
+				 String resultScore = resultObj.getString("score");
+				 if (!StringUtil.isNull(resultScore)) {
+					 score = resultScore;
+				 }
+				 baseInfoRow.createCell(4).setCellValue(score);
+				 
+				 // 获取用户信贷信息
+				 List<Map<String, Object>> reditList = pReditDao.queryAll(personID);
+				 for (int j = 0 ; j < reditList.size(); j++) {
+					 Map<String, Object> map = reditList.get(j);
+					 reditRow = reditSheet.createRow(reditCount++);
+					 reditRow.createCell(0).setCellValue(name);
+					 reditRow.createCell(1).setCellValue(idCardNo);
+					 reditRow.createCell(2).setCellValue(StringUtil.null2Blank(String.valueOf(map.get("contactDate"))));
+					 reditRow.createCell(3).setCellValue(StringUtil.null2Blank(String.valueOf(map.get("hireDate"))));
+					 reditRow.createCell(4).setCellValue(StringUtil.null2Blank(String.valueOf(map.get("expireDate"))));
+					 reditRow.createCell(5).setCellValue(StringUtil.null2Blank(String.valueOf(map.get("loanUsed"))));
+					 reditRow.createCell(6).setCellValue(StringUtil.null2Blank(String.valueOf(map.get("totalAmount"))));
+					 reditRow.createCell(7).setCellValue(StringUtil.null2Blank(String.valueOf(map.get("balance"))));
+					 reditRow.createCell(8).setCellValue(StringUtil.null2Blank(String.valueOf(map.get("status"))));
+					 reditRow.createCell(9).setCellValue(StringUtil.null2Blank(String.valueOf(map.get("bizOccurOrg"))));
+					 reditRow.createCell(10).setCellValue(StringUtil.null2Blank(String.valueOf(map.get("createTime"))));
+				 }
+				
+				 // 被失信人被执行信息
+				 DBEntity entity = new DBEntity();
+				 entity.setTableName("ldb_dishonest_info");
+				 List<String> fields = new ArrayList<String>();
+				 fields.add("INAME");
+				 fields.add("CARDNUM");
+				 List<String> values = new ArrayList<String>();
+				 values.add(name);
+				 values.add(idCardNo);
+				 entity.setFields(fields);
+				 entity.setValues(values);
+				 List<Map<String, Object>> dishonestList = dbOperator.queryDatas(entity);
+				 for (Map<String, Object> map : dishonestList) {
+					dishonestInfoRow = dishonestInfoSheet.createRow(dishonestInfoCount++);
+					dishonestInfoRow.createCell(0).setCellValue(StringUtil.null2Blank(String.valueOf(map.get("INAME"))));
+					dishonestInfoRow.createCell(1).setCellValue(StringUtil.null2Blank(String.valueOf(map.get("CARDNUM"))));
+					dishonestInfoRow.createCell(2).setCellValue(StringUtil.null2Blank(String.valueOf(map.get("AREA_NAME"))));
+					dishonestInfoRow.createCell(3).setCellValue(StringUtil.null2Blank(String.valueOf(map.get("REG_DATE"))));
+					dishonestInfoRow.createCell(4).setCellValue(StringUtil.null2Blank(String.valueOf(map.get("GIST_CID"))));
+					dishonestInfoRow.createCell(5).setCellValue(StringUtil.null2Blank(String.valueOf(map.get("PERFORMANCE"))));
+					dishonestInfoRow.createCell(6).setCellValue(StringUtil.null2Blank(String.valueOf(map.get("COURT_NAME"))));
+					dishonestInfoRow.createCell(7).setCellValue(StringUtil.null2Blank(String.valueOf(map.get("DUTY"))));
+					dishonestInfoRow.createCell(8).setCellValue(StringUtil.null2Blank(String.valueOf(map.get("DISREPUT_TYPE_NAME"))));
+				 }
+				
+				 successCount++;
+ 			 }
+		}
+		
+		errorRow = errorSheet.createRow(failCount++);
+		errorRow.createCell(0).setCellValue("总计" + totalCount + "条");
+		errorRow = errorSheet.createRow(failCount++);
+		errorRow.createCell(0).setCellValue("成功" + successCount + "条");
+		errorRow = errorSheet.createRow(failCount++);
+		errorRow.createCell(0).setCellValue("失败" + (totalCount - successCount) + "条");
+		
+		String exportPath = Constants.BLANK;
+		// 生成返回信息文件
+		OutputStream os = null;
+		try {
+			String basePath = request.getSession().getServletContext().getRealPath(Constants.BATCH_QUERY_FILE);
+			
+			File file = new File(basePath);
+			if(!file.exists()){
+				file.mkdirs();
+			}
+			exportPath = basePath + File.separator + System.currentTimeMillis() + ".xls";
+			os = new FileOutputStream(exportPath);
+			resultBook.write(os);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				os.close();
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+		return exportPath;
+	}
+	
+	/**
+	 * 
+	 * @param errorSheet
+	 * @param failCount
+	 * @param name
+	 * @param idCardNo
+	 * @param message
+	 */
+	private void createErrorRow(XSSFSheet errorSheet, int failCount, String name, String idCardNo,  String message) {
+		 XSSFRow errorRow = errorSheet.createRow(failCount);
+		 errorRow.createCell(0).setCellValue(StringUtil.null2Blank(name));
+		 errorRow.createCell(1).setCellValue(StringUtil.null2Blank(idCardNo));
+		 errorRow.createCell(2).setCellValue(StringUtil.null2Blank(message));
 	}
 	
 	/**

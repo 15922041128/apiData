@@ -119,4 +119,17 @@ public class PersonRest {
 		result.put("filePath", exportPath);
 		return Response.ok(result).build();
 	}
+	
+	@POST
+	@Path("/queryAll")
+	@Produces({MediaType.MULTIPART_FORM_DATA, MediaType.APPLICATION_JSON})
+	public Response queryAll(@Context HttpServletRequest request) throws Exception {
+		DiskFileUpload fu = new DiskFileUpload();
+		FileItem fileItem = fu.parseRequest(request).get(0);
+		String exportPath = personBiz.queryAll(fileItem, request);
+		JSONObject result = new JSONObject();
+		exportPath = exportPath.substring(exportPath.indexOf("\\ApiData"));
+		result.put("filePath", exportPath);
+		return Response.ok(result).build();
+	}
 }
