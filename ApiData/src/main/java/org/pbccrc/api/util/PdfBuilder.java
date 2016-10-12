@@ -145,7 +145,8 @@ public class PdfBuilder {
 		}
 		
 		// 遍历查询项(其他信息)
-		for (String queryItem : queryItems) {
+		for (int i = 0; i < queryItems.length; i++) {
+			String queryItem = queryItems[i];
 			// 信用卡信息
 			if (Constants.ITEM_CREDITCARD.equals(queryItem)) {
 //				document.add(pubElements.PsubTitle("信用卡信息", pubElements.FontChinese16, imagePath2));
@@ -236,7 +237,9 @@ public class PdfBuilder {
 				// 将表格加入到PDF
 				document.add(headerTbl);
 				// 加入空行
-				document.add(pubElements.emptyRow());
+				if (i != queryItems.length - 1) {
+					document.add(pubElements.emptyRow());
+				}
 				continue;
 			}
 			// 贷款信息
@@ -317,7 +320,9 @@ public class PdfBuilder {
 				// 将表格加入到PDF
 				document.add(headerTbl);
 				// 加入空行
-				document.add(pubElements.emptyRow());
+				if (i != queryItems.length - 1) {
+					document.add(pubElements.emptyRow());
+				}
 				continue;
 			}
 			// 担保信息
@@ -330,7 +335,9 @@ public class PdfBuilder {
 				String[] guaranteeDataKey = { "编号", "guaranteeSum", "guaranteeStat", "guaranteeWay", "finance", "occurpyTime"};
 				document.add(pubElements.obj2Grid(null, true, obj.getJSONArray("guarantee"), guaranteeCnGrid, guaranteeDataKey));
 				// 加入空行
-				document.add(pubElements.emptyRow());
+				if (i != queryItems.length - 1) {
+					document.add(pubElements.emptyRow());
+				}
 				continue;
 			}
 			// 公积金信息
@@ -343,7 +350,9 @@ public class PdfBuilder {
 				String[] ggjDataKey = {"编号", "COMPANY", "OWNPERCENT", "FIRSTMONTH", "COPERCENT", "OPENDATE", "STATUS", "LASTDATE", "PAY", "TOMONTH"};
 				document.add(pubElements.obj2Grid(null, true, obj.getJSONArray("gjj"), ggjCnGrid, ggjDataKey));
 				// 加入空行
-				document.add(pubElements.emptyRow());
+				if (i != queryItems.length - 1) {
+					document.add(pubElements.emptyRow());
+				}
 				continue;
 			}
 			// 失信被执行人信息
@@ -356,7 +365,9 @@ public class PdfBuilder {
 				String[] sxrDataKey = {"编号", "COURT_NAME", "AREA_NAME", "CASE_CODE", "PERFORMANCE", "DISREPUT_TYPE_NAME", "PUBLISH_DATE"};
 				document.add(pubElements.obj2Grid(null, true, obj.getJSONObject("sxr").getJSONArray("retData"), sxrCnGrid, sxrDataKey));
 				// 加入空行
-				document.add(pubElements.emptyRow());
+				if (i != queryItems.length - 1) {
+					document.add(pubElements.emptyRow());
+				}
 				continue;
 			}
 			// 涉法涉诉信息
@@ -376,7 +387,9 @@ public class PdfBuilder {
 				sfsxGrid = pubElements.obj2Grid(sfsxGrid, false, obj.getJSONArray("cpws"), sfssCnGrid, cpwsDataKey);
 				document.add(sfsxGrid);
 				// 加入空行
-				document.add(pubElements.emptyRow());
+				if (i != queryItems.length - 1) {
+					document.add(pubElements.emptyRow());
+				}
 				continue;
 			}
 		}
