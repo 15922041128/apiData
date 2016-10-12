@@ -1,5 +1,7 @@
 package org.pbccrc.api.util.pdf;
 
+import org.pbccrc.api.util.StringUtil;
+
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.itextpdf.text.BaseColor;
@@ -16,7 +18,9 @@ public class pubElements {
 	  public static Font FontChinese24;
 	  public static Font FontChinese18;
 	  public static Font FontChinese16;
+	  public static Font FontChinese14;
 	  public static Font FontChinese12;
+	  public static Font FontChinese10;
 	  public static Font FontChinese11Bold;
 	  public static Font FontChinese8Bold;
 	  public static Font FontChinese11;
@@ -29,7 +33,9 @@ public class pubElements {
 		     FontChinese24 = new com.itextpdf.text.Font(bfChinese, 24, com.itextpdf.text.Font.BOLD);
 	         FontChinese18 = new com.itextpdf.text.Font(bfChinese, 18, com.itextpdf.text.Font.BOLD); 
 	         FontChinese16 = new com.itextpdf.text.Font(bfChinese, 16, com.itextpdf.text.Font.BOLD);
+	         FontChinese14 = new com.itextpdf.text.Font(bfChinese, 14, com.itextpdf.text.Font.BOLD);
 	         FontChinese12 = new com.itextpdf.text.Font(bfChinese, 12, com.itextpdf.text.Font.NORMAL);
+	         FontChinese10 = new com.itextpdf.text.Font(bfChinese, 10, com.itextpdf.text.Font.NORMAL);
 	         FontChinese11Bold = new com.itextpdf.text.Font(bfChinese, 11, com.itextpdf.text.Font.BOLD);
 	         FontChinese8Bold = new com.itextpdf.text.Font(bfChinese, 8, com.itextpdf.text.Font.BOLD);
 	         FontChinese11 = new com.itextpdf.text.Font(bfChinese, 11, com.itextpdf.text.Font.ITALIC);
@@ -80,9 +86,11 @@ public class pubElements {
         table.setWidths(width21); 
         table.getDefaultCell().setBorder(0);
         PdfPCell cell21 = new PdfPCell(new Paragraph(title, font));
-        Image image21 = Image.getInstance(imagePath2); 
+        if (!StringUtil.isNull(imagePath2)) {
+        	Image image21 = Image.getInstance(imagePath2); 
+        	table.addCell(image21);
+        }
         cell21.setBorder(0);
-        table.addCell(image21);
         table.addCell(cell21); 
         }catch (Exception ex) {
             ex.printStackTrace();
@@ -156,10 +164,11 @@ public class pubElements {
 	        if (hasHead) {
 	        	 for (int i = 0; i < cnName.length; i++) {
 	 	        	PdfPCell cell = new PdfPCell(new Paragraph(cnName[i],FontChinese8Bold));
-	 	        	cell.setFixedHeight(25);
+	 	        	cell.setFixedHeight(20);
 	 	        	cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 	 	        	cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
 	 	        	cell.setBorderColor(lightGrey);
+	 	        	cell.setBackgroundColor(new BaseColor(240,248,255));
 	 	        	if (i!=0)
 	 	        		cell.disableBorderSide(4);
 	 	        	if (i!=cnName.length-1)
@@ -171,6 +180,48 @@ public class pubElements {
 	        	JSONObject dataObj = dataArray.getJSONObject(i);
 	        	fillGridData(i, dataObj, table, key, FontChinese8Normal);
 			}
+        } catch (Exception e) {
+        	e.printStackTrace();
+		}
+        return table;
+	}
+	
+	/**
+	 * jsonObject转为Grid
+	 * @param dataArray
+	 * @param cnName
+	 * @param key
+	 * @return
+	 */
+	public static PdfPTable obj2Grid(PdfPTable table, boolean hasHead, JSONObject data, String[] cnName, String[] key) {
+		if (null == table) {
+			table = new PdfPTable(cnName.length);
+		}
+        try {
+	        BaseColor lightGrey = new BaseColor(0xCC, 0xCC, 0xCC);
+	        int[] width = new int[cnName.length];
+	        for (int i = 0; i < width.length; i++){
+	        	width[i] = 90 / cnName.length;
+	        }
+	        table.setWidths(width); 
+	        //生成表头
+	        if (hasHead) {
+	        	 for (int i = 0; i < cnName.length; i++) {
+	 	        	PdfPCell cell = new PdfPCell(new Paragraph(cnName[i], FontChinese8Bold));
+	 	        	cell.setFixedHeight(20);
+	 	        	cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+	 	        	cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+	 	        	cell.setBorderColor(lightGrey);
+	 	        	cell.setBackgroundColor(new BaseColor(240,248,255));
+	 	        	if (i!=0)
+	 	        		cell.disableBorderSide(4);
+	 	        	if (i!=cnName.length-1)
+	 	        		cell.disableBorderSide(8);
+	 	        	table.addCell(cell);
+	 			}
+	        }
+	        fillGridData(data, table, key, FontChinese8Normal);
+	        
         } catch (Exception e) {
         	e.printStackTrace();
 		}
@@ -193,19 +244,76 @@ public class pubElements {
 			} else {
 				cell = new PdfPCell(new Paragraph(obj.getString(key[i] == null ? "" : key[i]), font));
 			}
-			cell.setFixedHeight(25);
+			cell.setFixedHeight(20);
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
 			cell.setBorderColor(lightGrey);
-			if (i != 0)
+			if (i != 0) {
 				cell.disableBorderSide(4);
-			if (i != key.length - 1)
-				cell.disableBorderSide(8);
+			}
+			if (i != key.length - 1) {
+				cell.disableBorderSide(8);				
+			}
 			table.addCell(cell);
 		}
 	}
-        
 	
+	/**
+	 * 填充Grid数据(无编号)
+	 * @param obj
+	 * @param table
+	 * @param key
+	 * @param font
+	 */
+	private static void fillGridData(JSONObject obj, PdfPTable table, String[] key, Font font) {
+		BaseColor lightGrey = new BaseColor(0xCC, 0xCC, 0xCC);
+		for (int i = 0; i < key.length; i++) {
+			PdfPCell cell = null;
+			cell = new PdfPCell(new Paragraph(obj.getString(key[i] == null ? "" : key[i]), font));
+			cell.setFixedHeight(20);	
+			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+			cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+			cell.setBorderColor(lightGrey);
+			// 1，2，4，8 分别对应每行的上、下、左、右四个 边框
+			// 默认是显示的，要想隐藏上边框，disableBorderSide();方法的参数设置为1就行了
+			if (i != 0) {
+				cell.disableBorderSide(4);
+			}
+			if (i != key.length - 1) {
+				cell.disableBorderSide(8);				
+			}
+			table.addCell(cell);
+		}
+	}
+	
+	/**
+	 * 生成标题单元格
+	 * @param header
+	 * @return
+	 */
+	public  static PdfPCell createHeaderCell(String header) {
+		PdfPCell cell = new PdfPCell(new Paragraph(header, FontChinese8Normal));
+		cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+		cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+		cell.setBorderColor(new BaseColor(0xCC, 0xCC, 0xCC));
+//		cell.disableBorderSide(1);
+//		cell.disableBorderSide(2);
+//		cell.disableBorderSide(4);
+		cell.disableBorderSide(8);
+		return cell;
+	}
+
+	/**
+	 * 隐藏边框
+	 * @param cell
+	 * @param borders
+	 */
+	public static void disableBorderSides(PdfPCell cell, int[] borders) {
+		for (int i = 0; i < borders.length; i++) {
+			int border = borders[i];
+			cell.disableBorderSide(border);
+		}
+	}
 	
 	
 }

@@ -1,5 +1,6 @@
 package org.pbccrc.api.biz.impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -91,6 +92,9 @@ public class ComplexBizImpl implements ComplexBiz {
 			// 人员基本信息
 			if (Constants.ITEM_PERSON.equals(queryItem)) {
 				Map<String, Object> personMap = zhPersonDao.query(insideCode);
+				if (null == personMap) {
+					personMap = new HashMap<String, Object>();
+				}
 				personMap.put("name", name);
 				personMap.put("idCardNo", identifier);
 				returnMap.put("person", personMap);
@@ -99,30 +103,45 @@ public class ComplexBizImpl implements ComplexBiz {
 			// 居住信息
 			if (Constants.ITEM_ADDRESS.equals(queryItem)) {
 				Map<String, Object> addressMap = zhAddressDao.query(insideCode);
+				if (null == addressMap) {
+					addressMap = new HashMap<String, Object>();
+				}
 				returnMap.put("address", addressMap);
 				continue;
 			}
 			// 就业信息
 			if (Constants.ITEM_EMPLOYMENT.equals(queryItem)) {
 				Map<String, Object> employmentMap = zhEmploymentDao.query(insideCode);
+				if (employmentMap == null) {
+					employmentMap = new HashMap<String, Object>();
+				}
 				returnMap.put("employment", employmentMap);
 				continue;
 			}
 			// 贷款信息
 			if (Constants.ITEM_LOAN.equals(queryItem)) {
-				List<Map<String, Object>> loanList= zhLoanDao.query(insideCode);
-				returnMap.put("loan", loanList);
+				Map<String, Object> loanMap = zhLoanDao.query(insideCode);
+				if (null == loanMap) {
+					loanMap = new HashMap<String, Object>();
+				}
+				returnMap.put("loan", loanMap);
 				continue;
 			}
 			// 信用卡信息
 			if (Constants.ITEM_CREDITCARD.equals(queryItem)) {
 				Map<String, Object> creditCardMap = zhCreditCardDao.query(insideCode);
+				if (creditCardMap == null) {
+					creditCardMap = new HashMap<String, Object>();
+				}
 				returnMap.put("creditCard", creditCardMap);
 				continue;
 			}
 			// 担保信息
 			if (Constants.ITEM_GUARANTEE.equals(queryItem)) {
 				List<Map<String, Object>> guaranteeList = zhGuaranteeDao.query(insideCode);
+				if (null == guaranteeList) {
+					guaranteeList = new ArrayList<Map<String, Object>>();
+				}
 				returnMap.put("guarantee", guaranteeList);
 				continue;
 			}

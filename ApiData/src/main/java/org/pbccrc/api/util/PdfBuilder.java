@@ -39,9 +39,9 @@ public class PdfBuilder {
 	}
 	
 	public static void main(String[] args) throws Exception{
-//		String jsonString = txt2String();
-//		String outPath = "D:\\pdftest\\YingzeReport.PDF";
-//		new pdfBuilder().getPDF(jsonString, outPath);
+		String jsonString = txt2String();
+		String outPath = "D:\\pdftest\\YingzeReport.PDF";
+		new PdfBuilder().getPDF(jsonString, new String[]{"creditCard", "loan"}, outPath, null);
 	}
 
 	public String getPDF(String jsonString, String[] queryItems, String outPath, HttpServletRequest request) throws Exception{
@@ -57,6 +57,7 @@ public class PdfBuilder {
 		String score = obj.getString("score");
 		
 		String basePath = request.getSession().getServletContext().getRealPath(outPath);
+//		String basePath = "D:/pdftest";
 		
 		File file = new File(basePath);
 		if (!file.exists()) {
@@ -69,7 +70,7 @@ public class PdfBuilder {
 		
 		FileOutputStream out = new FileOutputStream(basePath);
 		
-		Document document = new Document(PageSize.A4);
+		Document document = new Document(PageSize.A4, 10, 10, 20, 20);
 		PdfWriter.getInstance(document, out);
 		document.open();
 
@@ -147,29 +148,180 @@ public class PdfBuilder {
 		for (String queryItem : queryItems) {
 			// 信用卡信息
 			if (Constants.ITEM_CREDITCARD.equals(queryItem)) {
+//				document.add(pubElements.PsubTitle("信用卡信息", pubElements.FontChinese16, imagePath2));
+//				document.add(pubElements.emptyRow());
+//				String[] creditCardCnName = { "信用卡张数", "授信总额度", "最大授信额度", "本币卡最大使用额", "外币卡最大使用额","逾期总期数", "最大逾期期数", "最早用卡时间", "已销卡数" };
+//				String[] creditCardKey = { "cards", "sumCreditLimit", "maxCreditLimit", "maxDebt", "foreignMaxDebt", "sumTermsPastDue", "maxTermsPastDue", "minCardDate", "closeCards" };
+//				obj2Table = pubElements.obj2Table(null, obj.getJSONObject("creditCard"), creditCardCnName, creditCardKey);
+//				document.add(obj2Table);
+//				continue;
 				document.add(pubElements.PsubTitle("信用卡信息", pubElements.FontChinese16, imagePath2));
 				document.add(pubElements.emptyRow());
-				String[] creditCardCnName = { "信用卡张数", "授信总额度", "最大授信额度", "本币卡最大使用额", "外币卡最大使用额","逾期总期数", "最大逾期期数", "最早用卡时间", "已销卡数" };
-				String[] creditCardKey = { "cards", "sumCreditLimit", "maxCreditLimit", "maxDebt", "foreignMaxDebt", "sumTermsPastDue", "maxTermsPastDue", "minCardDate", "closeCards" };
-				obj2Table = pubElements.obj2Table(null, obj.getJSONObject("creditCard"), creditCardCnName, creditCardKey);
-				document.add(obj2Table);
+				
+				PdfPTable headerTbl = new PdfPTable(2);
+				headerTbl.setWidths(new int[]{10, 90});
+				
+				// 卡数
+				PdfPCell cell = pubElements.createHeaderCell("卡数");
+				headerTbl.addCell(cell);
+				
+				String[] num_Name = {"正常卡数", "未激活卡数", "销户卡数", "非正常卡数"};
+				String[] num_Key = {"nor_num", "inactive_num", "close_num", "abnor_num"};
+				PdfPTable tbl = pubElements.obj2Grid(null, true, obj.getJSONObject("creditCard"), num_Name, num_Key);
+				
+				String[] num_Name2 = {"正常外币卡数", "销户外币卡数", "非正常外币卡数", "发卡机构数"};
+				String[] num_Key2 = {"nor_foreign_num", "close_foreign_num", "abnor_foreign_num", "org_num"};
+				tbl = pubElements.obj2Grid(tbl, true, obj.getJSONObject("creditCard"), num_Name2, num_Key2);
+				
+				cell = new PdfPCell(tbl);
+				pubElements.disableBorderSides(cell, new int[]{1, 2, 4, 8});
+				headerTbl.addCell(cell);
+				
+				// 授信额度
+				cell = pubElements.createHeaderCell("授信额度");
+				headerTbl.addCell(cell);
+				
+				String[] grantCreditLimitName = {"在用卡总授信额度", "已销户总授信额度", "非正常卡总授信额度", "未激活卡总授信额度"};
+				String[] grantCreditLimitKey = {"gran_inuse_total", "gran_cloes_total", "gran_abnor_total", "gran_inact_total"};
+				tbl = pubElements.obj2Grid(null, true, obj.getJSONObject("creditCard"), grantCreditLimitName, grantCreditLimitKey);
+				
+				String[] grantCreditLimitName2 = {"正常卡单卡最大授信额度", "已销户卡单卡最大授信额度", "非正常卡单卡最大授信额度", "未激活卡单卡最大授信额度"};
+				String[] grantCreditLimitKey2 = {"gran_nor_max", "gran_close_max", "gran_abnor_max", "gran_inact_max"};
+				tbl = pubElements.obj2Grid(tbl, true, obj.getJSONObject("creditCard"), grantCreditLimitName2, grantCreditLimitKey2);
+				
+				String[] grantCreditLimitName3 = {"正常卡单卡最小授信额度", "已销户卡单卡最小授信额度", "非正常卡单卡最小授信额度", "未激活卡单卡最小授信额度"};
+				String[] grantCreditLimitKey3 = {"gran_nor_min", "gran_close_min", "gran_abnor_min", "gran_inact_min"};
+				tbl = pubElements.obj2Grid(tbl, true, obj.getJSONObject("creditCard"), grantCreditLimitName3, grantCreditLimitKey3);
+				
+				cell = new PdfPCell(tbl);
+				pubElements.disableBorderSides(cell, new int[]{1, 2, 4, 8});
+				headerTbl.addCell(cell);
+				
+				// 使用额度
+				cell = pubElements.createHeaderCell("使用额度");
+				headerTbl.addCell(cell);
+				
+				String[] useLimitName = {"正常卡单卡最大使用额度", "已销户卡单卡最大使用额度", "正常外币单卡最大使用额度", "已销卡外币单卡最大使用额度"};
+				String[] useLimitKey = {"use_nor_max", "use_close_max", "use_nor_for_max", "use_close_for_max"};
+				tbl = pubElements.obj2Grid(null, true, obj.getJSONObject("creditCard"), useLimitName, useLimitKey);
+				
+				cell = new PdfPCell(tbl);
+				pubElements.disableBorderSides(cell, new int[]{1, 2, 4, 8});
+				headerTbl.addCell(cell);
+				
+				// 逾期
+				cell = pubElements.createHeaderCell("逾期");
+				headerTbl.addCell(cell);
+				
+				String[] overdueName = {"总逾期期数", "最大逾期期数", "逾期180天最大金额", "逾期180天总金额"};
+				String[] overdueKey = {"overdue_total_times", "overdue_max_times", "overdue_180_max", "overdue_180_total"};
+				tbl = pubElements.obj2Grid(null, true, obj.getJSONObject("creditCard"), overdueName, overdueKey);
+				
+				cell = new PdfPCell(tbl);
+				pubElements.disableBorderSides(cell, new int[]{1, 2, 4, 8});
+				headerTbl.addCell(cell);
+				
+				// 时间
+				cell = pubElements.createHeaderCell("时间");
+				headerTbl.addCell(cell);
+				
+				String[] timeName = {"历史最早用卡时间", "在用卡最早用卡时间"};
+				String[] timeKey = {"ear_his_time", "ear_inuse_time"};
+				tbl = pubElements.obj2Grid(null, true, obj.getJSONObject("creditCard"), timeName, timeKey);
+				
+				cell = new PdfPCell(tbl);
+				pubElements.disableBorderSides(cell, new int[]{1, 2, 4, 8});
+				headerTbl.addCell(cell);
+				
+				// 将表格加入到PDF
+				document.add(headerTbl);
+				// 加入空行
+				document.add(pubElements.emptyRow());
 				continue;
 			}
 			// 贷款信息
 			if (Constants.ITEM_LOAN.equals(queryItem)) {
+//				// 添加贷款信息块
+//				document.add(pubElements.PsubTitle("贷款信息", pubElements.FontChinese16, imagePath2));
+//				document.add(pubElements.emptyRow());
+//				// 添加贷款信息Grid
+//				String[] loanCnGrid = { "编号", "贷款类型", "业务发生地", "机构", "贷款额度", "借款日期", "贷款到期日", "贷款状态" };
+//				String[] loanDataKey = { "编号", "loanType", "areaName", "finance", "loanAmount", "dateOpened", "dateClosed", "accountStat" };
+//				document.add(pubElements.obj2Grid(null, true, obj.getJSONArray("loan"), loanCnGrid, loanDataKey));
+//				// 加入空行
+//				document.add(pubElements.emptyRow());
+//				continue;
 				// 添加贷款信息块
 				document.add(pubElements.PsubTitle("贷款信息", pubElements.FontChinese16, imagePath2));
 				document.add(pubElements.emptyRow());
-				// 添加贷款信息Grid
-				String[] loanCnGrid = { "编号", "贷款类型", "业务发生地", "机构", "贷款额度", "借款日期", "贷款到期日", "贷款状态" };
-				String[] loanDataKey = { "编号", "loanType", "areaName", "finance", "loanAmount", "dateOpened", "dateClosed", "accountStat" };
-				document.add(pubElements.obj2Grid(null, true, obj.getJSONArray("loan"), loanCnGrid, loanDataKey));
+				
+				PdfPTable headerTbl = new PdfPTable(2);
+				headerTbl.setWidths(new int[]{10, 90});
+				
+				// 贷款数
+				PdfPCell cell = pubElements.createHeaderCell("贷款数");
+				headerTbl.addCell(cell);
+				
+				String[] numName = {"结清账户数", "未结清账户数", "机构数", "地区数", "贷款类型数"};
+				String[] numKey = {"settled_account_num", "unsettled_account_num", "org_num", "area_num", "loan_type_num"};
+				PdfPTable tbl = pubElements.obj2Grid(null, true, obj.getJSONObject("loan"), numName, numKey);
+				
+				String[] numName2 = {"住房贷款笔数", "汽车贷款笔数", "个人经营性贷款笔数", "正常笔数", "逾期笔数"};
+				String[] numKey2 = {"housing_loan_num", "car_loan_num", "personal_biz_loan_num", "nor_num", "overdue_num"};
+				tbl = pubElements.obj2Grid(tbl, true, obj.getJSONObject("loan"), numName2, numKey2);
+				
+				cell = new PdfPCell(tbl);
+				pubElements.disableBorderSides(cell, new int[]{1, 2, 4, 8});
+				headerTbl.addCell(cell);
+				
+				// 额度
+				cell = pubElements.createHeaderCell("额度");
+				headerTbl.addCell(cell);
+				
+				String[] limitName = {"贷款最大授信额度", "最大贷款额度", "结清贷款额度", "未结清贷款总额度"};
+				String[] limitKey = {"max_gran_limit", "max_loan_limit", "settled_limit", "unsettled_limit"};
+				tbl = pubElements.obj2Grid(null, true, obj.getJSONObject("loan"), limitName, limitKey);
+				
+				cell = new PdfPCell(tbl);
+				pubElements.disableBorderSides(cell, new int[]{1, 2, 4, 8});
+				headerTbl.addCell(cell);
+				
+				// 逾期
+				cell = pubElements.createHeaderCell("逾期");
+				headerTbl.addCell(cell);
+				
+				String[] overdueName = {"逾期180天贷款本金", "逾期180天贷款未付余额", "逾期180天单笔贷款本金", "逾期180天单笔贷款未付余额"};
+				String[] overdueKey = {"overdue_180_principal", "overdue_180_unpaid", "overdue_180_single_principal", "overdue_180_single_unpaid"};
+				tbl = pubElements.obj2Grid(null, true, obj.getJSONObject("loan"), overdueName, overdueKey);
+
+				String[] overdueName2 = {"总逾期期数", "单笔最大逾期期数", "五级分类最严重状态", ""};
+				String[] overdueKey2 = {"total_overdue_num", "single_overdue_max", "five_category_most_type", ""};
+				tbl = pubElements.obj2Grid(tbl, true, obj.getJSONObject("loan"), overdueName2, overdueKey2);
+				
+				cell = new PdfPCell(tbl);
+				pubElements.disableBorderSides(cell, new int[]{1, 2, 4, 8});
+				headerTbl.addCell(cell);
+				
+				// 时间
+				cell = pubElements.createHeaderCell("时间");
+				headerTbl.addCell(cell);
+				
+				String[] timeName = {"最早贷款时间", "最晚还贷时间"};
+				String[] timeKey = {"ear_loan_time", "latest_repay_time"};
+				tbl = pubElements.obj2Grid(null, true, obj.getJSONObject("loan"), timeName, timeKey);
+
+				cell = new PdfPCell(tbl);
+				pubElements.disableBorderSides(cell, new int[]{1, 2, 4, 8});
+				headerTbl.addCell(cell);
+				
+				// 将表格加入到PDF
+				document.add(headerTbl);
 				// 加入空行
 				document.add(pubElements.emptyRow());
 				continue;
 			}
 			// 担保信息
-			if (Constants.ITEM_GUARANTEE.equals(queryItem)) {
+			if (Constants.ITEM_GUARANTEE.equals(queryItem)) { 
 				// 添加担保信息块
 				document.add(pubElements.PsubTitle("担保信息", pubElements.FontChinese16, imagePath2));
 				document.add(pubElements.emptyRow());
@@ -202,7 +354,7 @@ public class PdfBuilder {
 				// 添加担保信息Grid
 				String[] sxrCnGrid = {"编号", "执行法院", "省份", "案号", "被执行人的履行情况", "失信被执行人行为具体情形", "发布时间"};
 				String[] sxrDataKey = {"编号", "COURT_NAME", "AREA_NAME", "CASE_CODE", "PERFORMANCE", "DISREPUT_TYPE_NAME", "PUBLISH_DATE"};
-				document.add(pubElements.obj2Grid(null, true, obj.getJSONArray("sxr"), sxrCnGrid, sxrDataKey));
+				document.add(pubElements.obj2Grid(null, true, obj.getJSONObject("sxr").getJSONArray("retData"), sxrCnGrid, sxrDataKey));
 				// 加入空行
 				document.add(pubElements.emptyRow());
 				continue;
