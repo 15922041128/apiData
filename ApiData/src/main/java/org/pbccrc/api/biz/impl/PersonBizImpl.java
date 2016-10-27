@@ -65,7 +65,7 @@ public class PersonBizImpl implements PersonBiz {
 	 * @param currentUser	当前用户
 	 * @return
 	 */
-	public String addPerson(String name, String idCardNo, String tel, String address, File photo, String currentUser) {
+	public JSONObject addPerson(String name, String idCardNo, String tel, String address, File photo, String currentUser) {
 		
 		Map<String, String> person = new HashMap<String, String>();
 		person.put("name", name);
@@ -111,7 +111,11 @@ public class PersonBizImpl implements PersonBiz {
 		pBaseInfo.put("updateTime", format.format(new Date()));
 		pBaseInfoDao.addPerson(pBaseInfo);
 		
-		return personID;
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("personID", personID);
+		jsonObject.put("pBaseInfoID", pBaseInfo.get("ID"));
+		
+		return jsonObject;
 		
 	}
 	
@@ -128,7 +132,7 @@ public class PersonBizImpl implements PersonBiz {
 	 * @param user				当前用户
 	 * @return
 	 */
-	public boolean addPersonRedit(String personID, String contactDate, String hireDate, String expireDate, 
+	public JSONObject addPersonRedit(String personID, String contactDate, String hireDate, String expireDate, 
 			String type, String loanUsed, String totalAmount, String balance, String status, User user) {
 		
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -149,7 +153,11 @@ public class PersonBizImpl implements PersonBiz {
 		pRedit.put("updateUser", user.getUserName());
 		pRedit.put("updateTime", format.format(new Date()));
 		
-		return pReditDao.addPRedit(pRedit) > 0;
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("isSuccess", pReditDao.addPRedit(pRedit) > 0);
+		jsonObject.put("pRedit", pRedit);
+		
+		return jsonObject;
 	}
 	
 	/**

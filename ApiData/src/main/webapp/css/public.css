@@ -137,6 +137,7 @@ width:990px; margin:0 auto; min-width:980px; height:80px; line-height:30px;}
 
 .vCode_text{ width:90px; height:30px; line-height:30px; border:1px solid #D1D1D1; color:#686868; float:left; text-indent:8px; display:inline;}
 .regist_text{ width:150px; height:32px; text-align:right; float:left; line-height:32px; color:#444;}
+.regist_text_w190{ width:190px; height:32px; text-align:right; float:left; line-height:32px; color:#444;}
 .login_input{ width:220px; height:30px; line-height:30px; border:1px solid #D1D1D1; color:#686868; float:left; text-indent:8px; display:inline;}
 .password{ width:28px; height:21px; float:left; margin-left:-35px; display:inline; margin-top:5px;}
 .earn_tel{ width:86px; height:23px; border:none; margin:4px 15px; display:inline; background:url(../images/img/earn.png) no-repeat; 

@@ -78,30 +78,33 @@ function uploadComplete() {
 			var downLink = document.createElement("a");
 			document.body.appendChild(downLink);
 			downLink.href = result.filePath;
+			alert(result.filePath);
 			downLink.click();
 		});
 }
+
 </script>
 </head>
 <body marginwidth="1" marginheight="1">
 <div class="con_right">
 	<form id="pushForm"  name="ajform" enctype="multipart/form-data" method="post">
 	<ul class="padding_left_40">
-		<li style="padding-left:200px; padding-top: 30px; padding-bottom: 20px;" " >
+		<li style="padding-left:150px; padding-top: 30px; padding-bottom: 20px;" " >
 			<font class="regist_text span-14"><h2 style="color: #6b6b6b"> 信用风险批量查询</h2></font>
 			<br/>
 		</li>
+		
 		<li class=" margin_top_20 height32">
-			<font class="regist_text span-14"><label class="span-red">
+			<font class="regist_text_w190 span-14"><label class="span-red">
 					*
-			</label> 请选择模板文件：</font>
+			</label> 请选择模板文件(<a href="../../r/person/downloadTemplate/query">模板下载</a>)：</font>
 			<input maxlength="30" name="inputFile" id="inputFile" fileindex="1" type="file"><br><br>
 			<div id="parent"><div id="son"></div></div>
 		</li>
 		
+		
 		<li class="padding_top_30">
-			<font class="regist_text"></font>
-			<input type="button" class="inputBtn btn2" value="上传" onclick="doSubmit()">
+			<input type="button" class="inputBtn btn2" value="上传" onclick="doSubmit()" style="margin-left:112px;margin-top:20px">
 		</li>
 	</ul>
 	</form>

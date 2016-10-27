@@ -4,6 +4,9 @@ public class Constants {
 	
 	public static final int COUNT_MAX = -1;
 	
+	public static final String STR_ZERO = "0";
+	public static final String STR_ONE = "1";
+	
 	public static final String BLANK = "";
 	public static final String POINT = ".";
 	public static final String UNDERLINE = "_";
@@ -38,6 +41,10 @@ public class Constants {
 	public static final String UPLOAD_ERROR_FILE = "/files/download/uploadError";
 	// 批量查询文件目录
 	public static final String BATCH_QUERY_FILE = "/files/download/batchQuery";
+	// 批量报送模板文件
+	public static final String BATCH_ADD_TEMPLATE_FILE =  "/files/template/addTemplate.xlsm";
+	// 批量查询模板文件
+	public static final String BATCH_QUERY_TEMPLATE_FILE =  "/files/template/queryTemplate.xlsx";
 	
 	/** 返回code */
 	public static final String RET_CODE_SUCCESS = "success";
@@ -217,5 +224,17 @@ public class Constants {
 	public static final String ITEM_SFSS = "sfss";
 	// 失信人被执行信息
 	public static final String ITEM_SXR = "sxr";
+	
+	/** 信用风险信息服务平台用户操作类型 */
+	// 单次查询
+	public static final String OPERATOR_TYPE_QUERY = "1";
+	// 单次报送step1
+	public static final String OPERATOR_TYPE_ADD_STEP1 = "2";
+	// 单次报送step2
+	public static final String OPERATOR_TYPE_ADD_STEP2 = "3";
+	// 批量查询
+	public static final String OPERATOR_TYPE_QUERYALL = "4";
+	// 批量报送
+	public static final String OPERATOR_TYPE_ADDALL = "5";
 	
 }

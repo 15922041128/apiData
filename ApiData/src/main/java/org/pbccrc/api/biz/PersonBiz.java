@@ -20,7 +20,7 @@ public interface PersonBiz {
 	 * @param currentUser
 	 * @return
 	 */
-	public String addPerson(String name, String idCardNo, String tel, String address, File photo, String currentUser);
+	public JSONObject addPerson(String name, String idCardNo, String tel, String address, File photo, String currentUser);
 	
 	/**
 	 * @param personID 			personID
@@ -35,7 +35,7 @@ public interface PersonBiz {
 	 * @param user				当前用户
 	 * @return
 	 */
-	public boolean addPersonRedit(String personID, String contactDate, String hireDate, String expireDate, 
+	public JSONObject addPersonRedit(String personID, String contactDate, String hireDate, String expireDate, 
 			String type, String loanUsed, String totalAmount, String balance, String status, User user);
 	
 	/**
